@@ -219,19 +219,25 @@ const Projects = () => {
                          project.status === 'Contract' ? '50%' : '25%'}
                       </span>
                       {project.status === 'Intake' && (
-                        <Button size="xs" className="text-xs px-2 py-1 h-6 bg-amber-500 hover:bg-amber-600">
-                          Generate Contract
-                        </Button>
+                        <Link to={`/projects/${project.id}`}>
+                          <Button size="xs" className="text-xs px-2 py-1 h-6 bg-amber-500 hover:bg-amber-600">
+                            Generate Contract
+                          </Button>
+                        </Link>
                       )}
                       {project.status === 'Contract' && (
-                        <Button size="xs" className="text-xs px-2 py-1 h-6 bg-blue-500 hover:bg-blue-600">
-                          Create Invoice
-                        </Button>
+                        <Link to={`/projects/${project.id}`}>
+                          <Button size="xs" className="text-xs px-2 py-1 h-6 bg-blue-500 hover:bg-blue-600">
+                            Create Invoice
+                          </Button>
+                        </Link>
                       )}
                       {project.status === 'Billing' && (
-                        <Button size="xs" className="text-xs px-2 py-1 h-6 bg-purple-500 hover:bg-purple-600">
-                          Send Reminder
-                        </Button>
+                        <Link to={`/projects/${project.id}`}>
+                          <Button size="xs" className="text-xs px-2 py-1 h-6 bg-purple-500 hover:bg-purple-600">
+                            Send Reminder
+                          </Button>
+                        </Link>
                       )}
                     </div>
                   </div>
