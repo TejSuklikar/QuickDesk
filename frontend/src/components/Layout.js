@@ -7,7 +7,7 @@ import {
   FileText, 
   Receipt, 
   Inbox, 
-  FileTemplate,
+  FileImage,
   Settings,
   Menu,
   X,
