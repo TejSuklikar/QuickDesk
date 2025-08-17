@@ -1,53 +1,76 @@
-import { useEffect } from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 import "./App.css";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import axios from "axios";
-
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
-
-const Home = () => {
-  const helloWorldApi = async () => {
-    try {
-      const response = await axios.get(`${API}/`);
-      console.log(response.data.message);
-    } catch (e) {
-      console.error(e, `errored out requesting / api`);
-    }
-  };
-
-  useEffect(() => {
-    helloWorldApi();
-  }, []);
-
-  return (
-    <div>
-      <header className="App-header">
-        <a
-          className="App-link"
-          href="https://emergent.sh"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <img src="https://avatars.githubusercontent.com/in/1201222?s=120&u=2686cf91179bbafbc7a71bfbc43004cf9ae1acea&v=4" />
-        </a>
-        <p className="mt-5">Building something incredible ~!</p>
-      </header>
-    </div>
-  );
-};
+import Layout from "./components/Layout";
+import Dashboard from "./pages/Dashboard";
+import Clients from "./pages/Clients";
+import ClientDetail from "./pages/ClientDetail";
+import Projects from "./pages/Projects";
+import ProjectDetail from "./pages/ProjectDetail";
+import Contracts from "./pages/Contracts";
+import ContractDetail from "./pages/ContractDetail";
+import Invoices from "./pages/Invoices";
+import InvoiceDetail from "./pages/InvoiceDetail";
+import Inbox from "./pages/Inbox";
+import Templates from "./pages/Templates";
+import Settings from "./pages/Settings";
+import Login from "./pages/Login";
 
 function App() {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Check for existing session (mock for MVP)
+    const savedUser = localStorage.getItem('freeflow_user');
+    if (savedUser) {
+      setUser(JSON.parse(savedUser));
+    }
+    setLoading(false);
+  }, []);
+
+  const login = (userData) => {
+    setUser(userData);
+    localStorage.setItem('freeflow_user', JSON.stringify(userData));
+  };
+
+  const logout = () => {
+    setUser(null);
+    localStorage.removeItem('freeflow_user');
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <div className="text-xl text-slate-600">Loading FreeFlow...</div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Login onLogin={login} />;
+  }
+
   return (
-    <div className="App">
-      <BrowserRouter>
+    <BrowserRouter>
+      <Layout user={user} onLogout={logout}>
         <Routes>
-          <Route path="/" element={<Home />}>
-            <Route index element={<Home />} />
-          </Route>
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/clients" element={<Clients />} />
+          <Route path="/clients/:id" element={<ClientDetail />} />
+          <Route path="/projects" element={<Projects />} />
+          <Route path="/projects/:id" element={<ProjectDetail />} />
+          <Route path="/contracts" element={<Contracts />} />
+          <Route path="/contracts/:id" element={<ContractDetail />} />
+          <Route path="/invoices" element={<Invoices />} />
+          <Route path="/invoices/:id" element={<InvoiceDetail />} />
+          <Route path="/inbox" element={<Inbox />} />
+          <Route path="/templates" element={<Templates />} />
+          <Route path="/settings" element={<Settings />} />
         </Routes>
-      </BrowserRouter>
-    </div>
+      </Layout>
+    </BrowserRouter>
   );
 }
 
