@@ -62,25 +62,8 @@ Acme Corporation`;
       setExtractedData(response.data);
     } catch (error) {
       console.error('Error processing email:', error);
-      // Fallback with mock data for demo
-      setExtractedData({
-        client: {
-          name: "Demo Client",
-          email: "demo@example.com",
-          company: "Demo Corp"
-        },
-        project: {
-          title: "Website Project",
-          description: rawMessage.substring(0, 100) + "...",
-          timeline: "1 month",
-          budget: 2500
-        },
-        confidence: {
-          budget: 0.8,
-          timeline: 0.9
-        },
-        status: "intake_complete"
-      });
+      alert('Error processing email. Please check your connection and try again.');
+      setExtractedData(null);
     } finally {
       setLoading(false);
     }
