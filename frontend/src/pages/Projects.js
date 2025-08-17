@@ -208,15 +208,32 @@ const Projects = () => {
                   </div>
                 </div>
 
-                {/* Progress indicator */}
+                {/* Progress indicator with Actions */}
                 <div className="mt-4 pt-4 border-t border-slate-100">
-                  <div className="flex justify-between text-xs mb-1">
-                    <span className="text-slate-600">Progress</span>
-                    <span className="text-slate-500">
-                      {project.status === 'Done' ? '100%' : 
-                       project.status === 'Billing' ? '75%' : 
-                       project.status === 'Contract' ? '50%' : '25%'}
-                    </span>
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-xs text-slate-600">Progress</span>
+                    <div className="flex items-center space-x-2">
+                      <span className="text-xs text-slate-500">
+                        {project.status === 'Done' ? '100%' : 
+                         project.status === 'Billing' ? '75%' : 
+                         project.status === 'Contract' ? '50%' : '25%'}
+                      </span>
+                      {project.status === 'Intake' && (
+                        <Button size="xs" className="text-xs px-2 py-1 h-6 bg-amber-500 hover:bg-amber-600">
+                          Generate Contract
+                        </Button>
+                      )}
+                      {project.status === 'Contract' && (
+                        <Button size="xs" className="text-xs px-2 py-1 h-6 bg-blue-500 hover:bg-blue-600">
+                          Create Invoice
+                        </Button>
+                      )}
+                      {project.status === 'Billing' && (
+                        <Button size="xs" className="text-xs px-2 py-1 h-6 bg-purple-500 hover:bg-purple-600">
+                          Send Reminder
+                        </Button>
+                      )}
+                    </div>
                   </div>
                   <div className="progress-bar">
                     <div 
