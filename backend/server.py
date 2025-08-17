@@ -231,24 +231,49 @@ class ContractAgent:
         self.llm = LlmChat(
             api_key=os.environ['EMERGENT_LLM_KEY'],
             session_id="contract_agent",
-            system_message="""You are an AI contract agent. Generate professional freelance contracts.
+            system_message="""You are an AI contract agent. Generate professional freelance contract variables.
             
-            Return JSON with contract variables:
+            Return JSON with these exact contract variables:
             {
-                "client_legal_name": "full client name",
-                "deliverables": ["list of specific deliverables"],
-                "milestones": [{"name": "milestone", "due_date": "date", "amount": 0}],
-                "payment_terms": "payment terms description",
-                "total_amount": 0,
-                "timeline": "project timeline"
-            }"""
+                "client_name": "client full name",
+                "client_company": "company name or 'Individual' if none",
+                "client_email": "client email address",
+                "freelancer_name": "John Smith",
+                "freelancer_business": "Smith Digital Services",
+                "project_description": "detailed description of work to be performed",
+                "deliverables_list": ["specific deliverable 1", "specific deliverable 2", "specific deliverable 3"],
+                "start_date": "YYYY-MM-DD format",
+                "end_date": "YYYY-MM-DD format",
+                "milestone_1": "First milestone with deadline",
+                "milestone_2": "Second milestone with deadline", 
+                "milestone_3": "Third milestone with deadline",
+                "project_budget": 0,
+                "payment_terms": "50% upfront, 50% on completion",
+                "invoice_platform": "email",
+                "net_terms": "30",
+                "late_fee": "1.5",
+                "jurisdiction": "State of California"
+            }
+            
+            Generate realistic milestones, payment terms, and deadlines based on the project scope and timeline."""
         ).with_model("openai", "gpt-4o-mini")
     
     async def generate_contract_variables(self, project_data: Dict[str, Any], client_data: Dict[str, Any]) -> Dict[str, Any]:
         try:
-            prompt = f"""Generate contract variables for:
-            Project: {project_data}
-            Client: {client_data}
+            prompt = f"""Generate contract variables for this freelance project:
+            
+            Client Information:
+            - Name: {client_data.get('name', 'Unknown')}
+            - Email: {client_data.get('email', 'unknown@email.com')}
+            - Company: {client_data.get('company', 'Individual')}
+            
+            Project Information:
+            - Title: {project_data.get('title', 'Untitled Project')}
+            - Description: {project_data.get('description', 'No description provided')}
+            - Budget: ${project_data.get('budget', 0)}
+            - Timeline: {project_data.get('timeline', 'Not specified')}
+            
+            Generate professional contract variables with realistic milestones and payment terms.
             """
             user_message = UserMessage(text=prompt)
             response = await self.llm.send_message(user_message)
@@ -256,13 +281,31 @@ class ContractAgent:
             return json.loads(response)
         except Exception as e:
             logger.error(f"Contract agent error: {e}")
+            # Enhanced fallback with proper structure
             return {
-                "client_legal_name": client_data.get("name", ""),
-                "deliverables": [project_data.get("description", "")],
-                "milestones": [],
-                "payment_terms": "Net 30",
-                "total_amount": project_data.get("budget", 0),
-                "timeline": project_data.get("timeline", "")
+                "client_name": client_data.get("name", "Client Name"),
+                "client_company": client_data.get("company", "Individual"),
+                "client_email": client_data.get("email", "client@example.com"),
+                "freelancer_name": "John Smith",
+                "freelancer_business": "Smith Digital Services",
+                "project_description": project_data.get("description", "Professional services as described"),
+                "deliverables_list": [
+                    "Project planning and requirements analysis",
+                    "Development and implementation", 
+                    "Testing and quality assurance",
+                    "Final delivery and documentation"
+                ],
+                "start_date": datetime.utcnow().strftime("%Y-%m-%d"),
+                "end_date": (datetime.utcnow() + timedelta(days=30)).strftime("%Y-%m-%d"),
+                "milestone_1": "Project kickoff and requirements - Week 1",
+                "milestone_2": "Development phase completion - Week 3",
+                "milestone_3": "Final delivery and testing - Week 4",
+                "project_budget": project_data.get("budget", 0),
+                "payment_terms": "50% upfront, 50% on completion",
+                "invoice_platform": "email",
+                "net_terms": "30",
+                "late_fee": "1.5",
+                "jurisdiction": "State of California"
             }
 
 class BillingAgent:
