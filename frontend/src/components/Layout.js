@@ -26,7 +26,7 @@ const Layout = ({ children, user, onLogout }) => {
     { name: 'Contracts', href: '/contracts', icon: FileText },
     { name: 'Invoices', href: '/invoices', icon: Receipt },
     { name: 'Inbox', href: '/inbox', icon: Inbox },
-    { name: 'Templates', href: '/templates', icon: FileTemplate },
+    { name: 'Templates', href: '/templates', icon: FileImage },
     { name: 'Settings', href: '/settings', icon: Settings },
   ];
 
