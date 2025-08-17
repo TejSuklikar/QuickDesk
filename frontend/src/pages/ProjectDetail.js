@@ -362,13 +362,20 @@ const ProjectDetail = () => {
                 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="text-sm font-medium text-slate-700">Client Legal Name</label>
-                    <p className="text-slate-900">{contract.variables.client_legal_name}</p>
+                    <label className="text-sm font-medium text-slate-700">Client</label>
+                    <p className="text-slate-900">{contract.variables.client_name}</p>
+                    <p className="text-sm text-slate-600">{contract.variables.client_company}</p>
+                  </div>
+                  
+                  <div>
+                    <label className="text-sm font-medium text-slate-700">Freelancer</label>
+                    <p className="text-slate-900">{contract.variables.freelancer_name}</p>
+                    <p className="text-sm text-slate-600">{contract.variables.freelancer_business}</p>
                   </div>
                   
                   <div>
                     <label className="text-sm font-medium text-slate-700">Total Amount</label>
-                    <p className="text-slate-900 font-medium">${contract.variables.total_amount}</p>
+                    <p className="text-slate-900 font-medium">${contract.variables.project_budget}</p>
                   </div>
                   
                   <div>
@@ -377,8 +384,34 @@ const ProjectDetail = () => {
                   </div>
                   
                   <div>
-                    <label className="text-sm font-medium text-slate-700">Timeline</label>
-                    <p className="text-slate-900">{contract.variables.timeline}</p>
+                    <label className="text-sm font-medium text-slate-700">Project Timeline</label>
+                    <p className="text-slate-900">{contract.variables.start_date} to {contract.variables.end_date}</p>
+                  </div>
+                  
+                  <div>
+                    <label className="text-sm font-medium text-slate-700">Net Terms</label>
+                    <p className="text-slate-900">{contract.variables.net_terms} days</p>
+                  </div>
+                </div>
+                
+                <div className="mt-4">
+                  <label className="text-sm font-medium text-slate-700">Deliverables</label>
+                  <ul className="mt-1 text-slate-900">
+                    {contract.variables.deliverables_list?.map((deliverable, index) => (
+                      <li key={index} className="flex items-start space-x-2">
+                        <span className="text-slate-500">•</span>
+                        <span>{deliverable}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                
+                <div className="mt-4">
+                  <label className="text-sm font-medium text-slate-700">Milestones</label>
+                  <div className="mt-1 space-y-1 text-slate-900">
+                    <p>• {contract.variables.milestone_1}</p>
+                    <p>• {contract.variables.milestone_2}</p>
+                    <p>• {contract.variables.milestone_3}</p>
                   </div>
                 </div>
                 
