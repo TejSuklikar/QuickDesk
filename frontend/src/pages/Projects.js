@@ -166,10 +166,21 @@ const Projects = () => {
                     </div>
                   </div>
                   
-                  <Badge className={`${getStatusColor(project.status)} flex items-center space-x-1`}>
-                    {getStatusIcon(project.status)}
-                    <span>{project.status}</span>
-                  </Badge>
+                  <div className="flex flex-col items-end space-y-1">
+                    <Badge className={`${getStatusColor(project.status)} flex items-center space-x-1`}>
+                      {getStatusIcon(project.status)}
+                      <span>{project.status}</span>
+                    </Badge>
+                    {project.status === 'Intake' && (
+                      <span className="text-xs text-amber-600 font-medium">Ready for Contract</span>
+                    )}
+                    {project.status === 'Contract' && (
+                      <span className="text-xs text-blue-600 font-medium">Ready for Billing</span>
+                    )}
+                    {project.status === 'Billing' && (
+                      <span className="text-xs text-purple-600 font-medium">Awaiting Payment</span>
+                    )}
+                  </div>
                 </div>
 
                 <p className="text-sm text-slate-600 mb-4 line-clamp-2">
