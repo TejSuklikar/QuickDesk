@@ -359,31 +359,97 @@ async def log_agent_event(trace_id: str, kind: EventKind, entity_type: str, enti
     logger.info(f"Logged event: {kind} for {entity_type}:{entity_id}")
 
 def generate_contract_pdf(variables: Dict[str, Any], output_path: str):
-    """Generate contract PDF using ReportLab"""
+    """Generate contract PDF using your custom template"""
     buffer = io.BytesIO()
-    doc = SimpleDocTemplate(buffer, pagesize=letter)
+    doc = SimpleDocTemplate(buffer, pagesize=letter, topMargin=1*inch)
     styles = getSampleStyleSheet()
     story = []
     
     # Title
-    title_style = ParagraphStyle('CustomTitle', parent=styles['Heading1'], fontSize=24, spaceAfter=30)
-    story.append(Paragraph("FREELANCE SERVICE AGREEMENT", title_style))
+    title_style = ParagraphStyle('CustomTitle', parent=styles['Heading1'], 
+                                fontSize=18, spaceAfter=20, alignment=1)
+    story.append(Paragraph("FREELANCE SERVICES AGREEMENT", title_style))
     story.append(Spacer(1, 20))
     
-    # Contract content
-    content = f"""
-    <b>Client:</b> {variables.get('client_legal_name', 'N/A')}<br/>
-    <b>Total Amount:</b> ${variables.get('total_amount', 0):,.2f}<br/>
-    <b>Timeline:</b> {variables.get('timeline', 'N/A')}<br/>
-    <b>Payment Terms:</b> {variables.get('payment_terms', 'Net 30')}<br/><br/>
+    # Contract content using your template
+    content_style = ParagraphStyle('Contract', parent=styles['Normal'], 
+                                  fontSize=11, spaceAfter=12, leading=16)
     
-    <b>Deliverables:</b><br/>
+    # Parties
+    parties_text = f"""
+    This Freelance Services Agreement ("Agreement") is made between:<br/><br/>
+    <b>Client:</b> {variables.get('client_name', 'N/A')}, {variables.get('client_company', 'N/A')}, 
+    with primary contact at {variables.get('client_email', 'N/A')} ("Client")<br/>
+    and<br/>
+    <b>Freelancer:</b> {variables.get('freelancer_name', 'N/A')}, 
+    operating as {variables.get('freelancer_business', 'N/A')} ("Freelancer").
+    """
+    story.append(Paragraph(parties_text, content_style))
+    story.append(Spacer(1, 20))
+    
+    # Section 1: Project Scope
+    scope_text = f"""
+    <b>1. Project Scope</b><br/>
+    Freelancer agrees to perform the following services for Client:<br/>
+    {variables.get('project_description', 'N/A')}<br/><br/>
+    Deliverables will include:<br/>
     """
     
-    for deliverable in variables.get('deliverables', []):
-        content += f"• {deliverable}<br/>"
+    deliverables = variables.get('deliverables_list', [])
+    for deliverable in deliverables:
+        scope_text += f"• {deliverable}<br/>"
     
-    story.append(Paragraph(content, styles['Normal']))
+    story.append(Paragraph(scope_text, content_style))
+    story.append(Spacer(1, 15))
+    
+    # Section 2: Timeline
+    timeline_text = f"""
+    <b>2. Timeline</b><br/>
+    Work will commence on {variables.get('start_date', 'TBD')} and is expected to be completed by {variables.get('end_date', 'TBD')}.<br/><br/>
+    Milestones:<br/>
+    • {variables.get('milestone_1', 'TBD')}<br/>
+    • {variables.get('milestone_2', 'TBD')}<br/>
+    • {variables.get('milestone_3', 'TBD')}<br/>
+    """
+    story.append(Paragraph(timeline_text, content_style))
+    story.append(Spacer(1, 15))
+    
+    # Section 3: Payment Terms
+    payment_text = f"""
+    <b>3. Payment Terms</b><br/>
+    Client agrees to pay Freelancer a total of <b>${variables.get('project_budget', 0):,.2f}</b> for the services described above.<br/><br/>
+    Payment schedule:<br/>
+    • {variables.get('payment_terms', 'Net 30')}<br/><br/>
+    Invoices will be sent via {variables.get('invoice_platform', 'email')} and are payable within {variables.get('net_terms', '30')} days. 
+    Late payments may incur a fee of {variables.get('late_fee', '1.5')}%.
+    """
+    story.append(Paragraph(payment_text, content_style))
+    story.append(Spacer(1, 15))
+    
+    # Sections 4-7: Standard Terms
+    standard_terms = """
+    <b>4. Ownership and Rights</b><br/>
+    Upon receipt of full payment, Client will own the final deliverables. Freelancer retains the right to showcase the work in portfolios or marketing materials.<br/><br/>
+    
+    <b>5. Confidentiality</b><br/>
+    Both parties agree to keep confidential information private, including trade secrets, client data, and sensitive business materials.<br/><br/>
+    
+    <b>6. Termination</b><br/>
+    Either party may terminate this Agreement with written notice. Client must pay for work completed up to the termination date.<br/><br/>
+    
+    <b>7. Governing Law</b><br/>
+    This Agreement will be governed by the laws of """ + variables.get('jurisdiction', 'State of California') + """.<br/><br/>
+    """
+    story.append(Paragraph(standard_terms, content_style))
+    story.append(Spacer(1, 30))
+    
+    # Signatures
+    signature_text = """
+    <b>Signatures</b><br/><br/>
+    Client: ___________________________   Date: ____________<br/><br/>
+    Freelancer: ________________________   Date: ____________
+    """
+    story.append(Paragraph(signature_text, content_style))
     
     doc.build(story)
     buffer.seek(0)
