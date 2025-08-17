@@ -13,7 +13,9 @@ import {
   Zap,
   FileText,
   Receipt,
-  Clock
+  Clock,
+  Eye,
+  Play
 } from 'lucide-react';
 import { Card } from '../components/ui/card';
 import { Button } from '../components/ui/button';
@@ -29,7 +31,7 @@ const Inbox = () => {
   const [extractedData, setExtractedData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [processing, setProcessing] = useState(false);
-  const [workflowStatus, setWorkflowStatus] = useState('idle');
+  const [projectCreated, setProjectCreated] = useState(false);
   const [projectId, setProjectId] = useState(null);
 
   // Example email for demonstration
@@ -94,73 +96,36 @@ Acme Corporation`;
     }));
   };
 
-  const handleFullAutomation = async () => {
+  const handleCreateProject = async () => {
     if (!extractedData) return;
     
     setProcessing(true);
-    setWorkflowStatus('creating_project');
     
     try {
-      // Step 1: Create Project
-      const projectResponse = await axios.post(`${BACKEND_URL}/api/intake/create-manual`, extractedData);
+      const response = await axios.post(`${BACKEND_URL}/api/intake/create-manual`, extractedData);
       
-      if (projectResponse.data.project_id) {
-        setProjectId(projectResponse.data.project_id);
-        setWorkflowStatus('generating_contract');
+      if (response.data.project_id) {
+        setProjectId(response.data.project_id);
+        setProjectCreated(true);
         
-        // Wait a moment for dramatic effect
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        
-        // Step 2: Generate Contract
-        try {
-          const contractResponse = await axios.post(`${BACKEND_URL}/api/contracts/generate`, {
-            project_id: projectResponse.data.project_id,
-            template_id: "standard_freelance_contract"
-          });
-          
-          setWorkflowStatus('creating_invoice');
-          await new Promise(resolve => setTimeout(resolve, 2000));
-          
-          // Step 3: Create Invoice
-          try {
-            const invoiceResponse = await axios.post(`${BACKEND_URL}/api/invoices/create`, {
-              project_id: projectResponse.data.project_id,
-              amount: extractedData.project.budget || 0,
-              mode: "fixed"
-            });
-            
-            setWorkflowStatus('complete');
-            
-            // Success message with project details
-            setTimeout(() => {
-              alert(`🎉 Complete Workflow Created!\n\n✅ Project: ${extractedData.project.title}\n✅ Contract: Generated & ready to send\n✅ Invoice: Created & ready to send\n\nCheck your Projects page to see everything!`);
-              
-              // Reset form
-              setRawMessage('');
-              setExtractedData(null);
-              setWorkflowStatus('idle');
-              setProjectId(null);
-            }, 1500);
-            
-          } catch (invoiceError) {
-            console.error('Invoice creation error:', invoiceError);
-            setWorkflowStatus('project_created');
-            alert('Project and contract created! (Invoice creation skipped for demo)');
-          }
-          
-        } catch (contractError) {
-          console.error('Contract generation error:', contractError);
-          setWorkflowStatus('project_created');
-          alert('Project created successfully! (Contract generation skipped for demo)');
-        }
+        // Show success message
+        setTimeout(() => {
+          alert(`✅ Project Created!\n\nName: ${extractedData.project.title}\nClient: ${extractedData.client.name}\nBudget: $${extractedData.project.budget}\n\n🎯 Next: Go to Projects page to generate contract`);
+        }, 500);
       }
     } catch (error) {
-      console.error('Error in automation:', error);
+      console.error('Error creating project:', error);
       alert('Error creating project. Please try again.');
-      setWorkflowStatus('idle');
     } finally {
       setProcessing(false);
     }
+  };
+
+  const handleStartOver = () => {
+    setRawMessage('');
+    setExtractedData(null);
+    setProjectCreated(false);
+    setProjectId(null);
   };
 
   const getConfidenceColor = (score) => {
@@ -175,66 +140,13 @@ Acme Corporation`;
     return 'Low';
   };
 
-  const WorkflowProgress = () => {
-    const steps = [
-      { key: 'creating_project', label: 'Creating Project', icon: CheckCircle, color: 'text-blue-500' },
-      { key: 'generating_contract', label: 'Generating Contract', icon: FileText, color: 'text-purple-500' },
-      { key: 'creating_invoice', label: 'Creating Invoice', icon: Receipt, color: 'text-green-500' },
-      { key: 'complete', label: 'Complete!', icon: Zap, color: 'text-emerald-500' }
-    ];
-
-    return (
-      <Card className="p-6 bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200">
-        <div className="flex items-center space-x-3 mb-4">
-          <Zap className="w-5 h-5 text-blue-500 animate-pulse" />
-          <h3 className="font-semibold text-blue-900">AI Workflow in Progress</h3>
-        </div>
-        
-        <div className="space-y-3">
-          {steps.map((step, index) => {
-            const isActive = workflowStatus === step.key;
-            const isCompleted = steps.findIndex(s => s.key === workflowStatus) > index;
-            const Icon = step.icon;
-            
-            return (
-              <div key={step.key} className={`flex items-center space-x-3 ${isActive ? 'animate-pulse' : ''}`}>
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                  isCompleted ? 'bg-green-100' : isActive ? 'bg-blue-100' : 'bg-slate-100'
-                }`}>
-                  <Icon className={`w-4 h-4 ${
-                    isCompleted ? 'text-green-600' : isActive ? step.color : 'text-slate-400'
-                  }`} />
-                </div>
-                <span className={`text-sm font-medium ${
-                  isCompleted ? 'text-green-700' : isActive ? 'text-blue-700' : 'text-slate-500'
-                }`}>
-                  {step.label}
-                  {isActive && <span className="ml-2">...</span>}
-                  {isCompleted && <span className="ml-2">✅</span>}
-                </span>
-              </div>
-            );
-          })}
-        </div>
-        
-        {workflowStatus === 'complete' && (
-          <div className="mt-4 p-3 bg-green-100 rounded-lg">
-            <p className="text-sm text-green-800 font-medium">
-              🎉 Full workflow created! Project → Contract → Invoice all ready to go!
-            </p>
-          </div>
-        )}
-      </Card>
-    );
-  };
-
   return (
     <div className="space-y-6 fade-in">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="heading-2 text-slate-900 mb-2">AI Workflow Automation</h1>
-          <p className="text-slate-600">Paste client email → AI creates complete project workflow automatically</p>
+          <h1 className="heading-2 text-slate-900 mb-2">Step-by-Step AI Workflow</h1>
+          <p className="text-slate-600">Process client emails with AI assistance, review each step before proceeding</p>
         </div>
         <div className="flex items-center space-x-3 mt-4 sm:mt-0">
           <Button
@@ -248,8 +160,74 @@ Acme Corporation`;
         </div>
       </div>
 
-      {/* Workflow Progress */}
-      {processing && <WorkflowProgress />}
+      {/* Workflow Steps Indicator */}
+      <Card className="p-4 bg-gradient-to-r from-slate-50 to-blue-50">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-8">
+            {/* Step 1 */}
+            <div className="flex items-center space-x-2">
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                extractedData ? 'bg-green-100 text-green-600' : rawMessage ? 'bg-blue-100 text-blue-600' : 'bg-slate-100 text-slate-400'
+              }`}>
+                <Mail className="w-4 h-4" />
+              </div>
+              <div>
+                <div className="text-sm font-medium text-slate-900">1. AI Extract</div>
+                <div className="text-xs text-slate-500">
+                  {extractedData ? 'Complete' : rawMessage ? 'Ready' : 'Waiting'}
+                </div>
+              </div>
+            </div>
+
+            <ArrowRight className="w-4 h-4 text-slate-300" />
+
+            {/* Step 2 */}
+            <div className="flex items-center space-x-2">
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                projectCreated ? 'bg-green-100 text-green-600' : extractedData ? 'bg-blue-100 text-blue-600' : 'bg-slate-100 text-slate-400'
+              }`}>
+                <CheckCircle className="w-4 h-4" />
+              </div>
+              <div>
+                <div className="text-sm font-medium text-slate-900">2. Create Project</div>
+                <div className="text-xs text-slate-500">
+                  {projectCreated ? 'Complete' : extractedData ? 'Ready' : 'Waiting'}
+                </div>
+              </div>
+            </div>
+
+            <ArrowRight className="w-4 h-4 text-slate-300" />
+
+            {/* Step 3 */}
+            <div className="flex items-center space-x-2">
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                projectCreated ? 'bg-blue-100 text-blue-600' : 'bg-slate-100 text-slate-400'
+              }`}>
+                <FileText className="w-4 h-4" />
+              </div>
+              <div>
+                <div className="text-sm font-medium text-slate-900">3. Generate Contract</div>
+                <div className="text-xs text-slate-500">
+                  {projectCreated ? 'Next Step' : 'Waiting'}
+                </div>
+              </div>
+            </div>
+
+            <ArrowRight className="w-4 h-4 text-slate-300" />
+
+            {/* Step 4 */}
+            <div className="flex items-center space-x-2">
+              <div className="w-8 h-8 rounded-full flex items-center justify-center bg-slate-100 text-slate-400">
+                <Receipt className="w-4 h-4" />
+              </div>
+              <div>
+                <div className="text-sm font-medium text-slate-900">4. Create Invoice</div>
+                <div className="text-xs text-slate-500">Waiting</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Card>
 
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
         {/* Left Panel - Raw Message Input */}
@@ -257,7 +235,7 @@ Acme Corporation`;
           <Card className="p-6">
             <div className="flex items-center space-x-3 mb-4">
               <Mail className="w-5 h-5 text-blue-500" />
-              <h2 className="text-lg font-semibold text-slate-900">Raw Client Email</h2>
+              <h2 className="text-lg font-semibold text-slate-900">Step 1: Paste Client Email</h2>
             </div>
             
             <div className="space-y-4">
@@ -267,6 +245,7 @@ Acme Corporation`;
                 onChange={(e) => setRawMessage(e.target.value)}
                 rows={12}
                 className="resize-none font-mono text-sm"
+                disabled={projectCreated}
               />
               
               <div className="flex items-center justify-between">
@@ -275,7 +254,7 @@ Acme Corporation`;
                 </div>
                 <Button
                   onClick={handleProcessEmail}
-                  disabled={!rawMessage.trim() || loading}
+                  disabled={!rawMessage.trim() || loading || projectCreated}
                   className="bg-gradient-to-r from-blue-500 to-purple-600"
                 >
                   {loading ? (
@@ -308,21 +287,46 @@ Acme Corporation`;
           )}
         </div>
 
-        {/* Right Panel - Extracted Data */}
+        {/* Right Panel - Extracted Data / Success */}
         <div className="space-y-6">
-          {extractedData ? (
+          {projectCreated ? (
+            /* Project Created Success */
+            <Card className="p-8 text-center bg-gradient-to-r from-green-50 to-emerald-50 border-green-200">
+              <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
+              <h2 className="text-xl font-semibold text-green-900 mb-2">✅ Project Created Successfully!</h2>
+              <p className="text-green-700 mb-6">
+                <strong>{extractedData?.project.title}</strong> for {extractedData?.client.name}
+              </p>
+              
+              <div className="space-y-3">
+                <Button 
+                  onClick={() => window.location.href = '/projects'}
+                  className="w-full bg-gradient-to-r from-blue-500 to-purple-600"
+                >
+                  <FileText className="w-4 h-4 mr-2" />
+                  Go to Projects → Generate Contract
+                </Button>
+                
+                <Button variant="outline" onClick={handleStartOver} className="w-full">
+                  <Mail className="w-4 h-4 mr-2" />
+                  Process Another Email
+                </Button>
+              </div>
+            </Card>
+          ) : extractedData ? (
+            /* Step 2: Review & Create Project */
             <>
               <Card className="p-6">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center space-x-3">
-                    <CheckCircle className="w-5 h-5 text-green-500" />
-                    <h2 className="text-lg font-semibold text-slate-900">Extracted Information</h2>
+                    <Eye className="w-5 h-5 text-green-500" />
+                    <h2 className="text-lg font-semibold text-slate-900">Step 2: Review & Edit</h2>
                   </div>
                   <Badge 
                     variant={extractedData.status === 'intake_complete' ? 'default' : 'secondary'}
                     className={extractedData.status === 'intake_complete' ? 'bg-green-100 text-green-800' : ''}
                   >
-                    {extractedData.status === 'intake_complete' ? 'Complete' : 'Needs Info'}
+                    {extractedData.status === 'intake_complete' ? 'Ready to Create' : 'Needs Review'}
                   </Badge>
                 </div>
 
@@ -444,55 +448,46 @@ Acme Corporation`;
                   </div>
                 </div>
 
-                {/* Action Buttons - NEW IMPROVED VERSION */}
-                <div className="space-y-3 pt-4 border-t border-slate-200">
+                {/* Action Buttons */}
+                <div className="flex items-center space-x-3 pt-4 border-t border-slate-200">
                   <Button
-                    onClick={handleFullAutomation}
+                    onClick={handleCreateProject}
                     disabled={processing}
-                    className="w-full bg-gradient-to-r from-emerald-500 to-blue-600 hover:from-emerald-600 hover:to-blue-700 text-white font-semibold py-3 text-base"
+                    className="flex-1 bg-gradient-to-r from-green-500 to-emerald-600"
                   >
                     {processing ? (
                       <>
-                        <RefreshCw className="w-5 h-5 mr-2 animate-spin" />
-                        Creating Full Workflow...
+                        <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                        Creating...
                       </>
                     ) : (
                       <>
-                        <Zap className="w-5 h-5 mr-2" />
-                        🚀 Create Complete Workflow (Project + Contract + Invoice)
+                        <CheckCircle className="w-4 h-4 mr-2" />
+                        Create Project
                       </>
                     )}
                   </Button>
                   
-                  <Button variant="outline" onClick={() => setExtractedData(null)} className="w-full">
+                  <Button variant="outline" onClick={() => setExtractedData(null)}>
                     <Edit3 className="w-4 h-4 mr-2" />
-                    Reset & Try Another Email
+                    Re-extract
                   </Button>
                 </div>
               </Card>
 
-              {/* Workflow Preview */}
-              <Card className="p-6 bg-gradient-to-r from-emerald-50 to-blue-50 border-emerald-200">
+              {/* Next Steps Preview */}
+              <Card className="p-6 bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200">
                 <div className="flex items-start space-x-3">
-                  <Zap className="w-5 h-5 text-emerald-500 mt-0.5" />
+                  <ArrowRight className="w-5 h-5 text-blue-500 mt-0.5" />
                   <div>
-                    <h3 className="font-medium text-emerald-900 mb-2">🚀 One-Click Full Automation</h3>
-                    <div className="space-y-2 text-sm text-emerald-800">
-                      <div className="flex items-center space-x-2">
-                        <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
-                        <span><strong>Step 1:</strong> Create project with client & details</span>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
-                        <span><strong>Step 2:</strong> AI generates professional contract</span>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
-                        <span><strong>Step 3:</strong> AI creates invoice with payment link</span>
-                      </div>
-                      <div className="mt-3 p-2 bg-emerald-100 rounded-lg">
-                        <span className="font-medium">Result: Complete project ready to send to client!</span>
-                      </div>
+                    <h3 className="font-medium text-blue-900 mb-1">After Creating Project</h3>
+                    <p className="text-sm text-blue-700 mb-3">
+                      You'll be able to review the project details and then generate a contract with AI assistance.
+                    </p>
+                    <div className="space-y-1 text-sm text-blue-600">
+                      <div>📋 <strong>Step 3:</strong> AI generates contract based on project details</div>
+                      <div>📧 <strong>Step 4:</strong> Review contract and send for signature</div>
+                      <div>💰 <strong>Step 5:</strong> Create invoice when contract is signed</div>
                     </div>
                   </div>
                 </div>
@@ -501,9 +496,9 @@ Acme Corporation`;
           ) : (
             <Card className="p-12 text-center border-2 border-dashed border-slate-200">
               <Bot className="w-12 h-12 text-slate-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-slate-900 mb-2">Ready for AI Magic</h3>
+              <h3 className="text-lg font-medium text-slate-900 mb-2">Ready for Step 1</h3>
               <p className="text-slate-600">
-                Paste a client inquiry and watch AI create your complete workflow: Project → Contract → Invoice
+                Paste a client inquiry and let AI extract the structured information for you to review.
               </p>
             </Card>
           )}
