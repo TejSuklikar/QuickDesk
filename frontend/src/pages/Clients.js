@@ -84,12 +84,8 @@ const Clients = () => {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="heading-2 text-slate-900 mb-2">Clients</h1>
-          <p className="text-slate-600">Manage your client relationships and contact information</p>
+          <p className="text-slate-600">View your clients created through email processing workflow</p>
         </div>
-        <Button className="mt-4 sm:mt-0 bg-gradient-to-r from-blue-500 to-purple-600">
-          <Plus className="w-4 h-4 mr-2" />
-          Add Client
-        </Button>
       </div>
 
       {/* Search */}
