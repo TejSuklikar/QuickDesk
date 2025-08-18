@@ -145,7 +145,6 @@ const Dashboard = () => {
         <StatusTile
           title="Intake"
           count={stats?.projects?.intake || 0}
-          progress={75}
           color="bg-gradient-to-br from-amber-500 to-orange-600"
           icon={Users}
           description="Processing inquiries"
@@ -153,7 +152,6 @@ const Dashboard = () => {
         <StatusTile
           title="Contract"
           count={stats?.projects?.contract || 0}
-          progress={60}
           color="bg-gradient-to-br from-blue-500 to-indigo-600"
           icon={FileText}
           description="Generating contracts"
@@ -161,7 +159,6 @@ const Dashboard = () => {
         <StatusTile
           title="Billing"
           count={stats?.projects?.billing || 0}
-          progress={90}
           color="bg-gradient-to-br from-purple-500 to-violet-600"
           icon={Receipt}
           description="Managing invoices"
