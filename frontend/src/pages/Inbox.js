@@ -415,7 +415,7 @@ Acme Corporation`;
                 <div className="space-y-3 mb-6">
                   <h3 className="font-medium text-slate-900">AI Confidence Scores</h3>
                   
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-slate-600">Budget</span>
                       <Badge className={getConfidenceColor(extractedData.confidence.budget)}>
