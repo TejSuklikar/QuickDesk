@@ -662,7 +662,7 @@ ${contract.variables.freelancer_email}`);
                   )}
                 </div>
                 
-                <div className="mt-4 grid grid-cols-2 gap-4">
+                <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="text-sm font-medium text-slate-700">Jurisdiction</label>
                     {editingContract ? (
