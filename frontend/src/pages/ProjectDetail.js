@@ -444,7 +444,7 @@ const ProjectDetail = () => {
                 {invoices.map((invoice) => (
                   <div key={invoice.id} className="border border-slate-200 rounded-lg p-4">
                     <div className="flex items-center justify-between mb-3">
-                      <span className="font-medium">Invoice #{invoice.id.substring(0, 8)}</span>
+                      <span className="font-medium">Invoice {invoice.details?.invoice_number || invoice.id.substring(0, 8)}</span>
                       <Badge className="bg-purple-100 text-purple-800">
                         {invoice.status}
                       </Badge>
@@ -462,9 +462,40 @@ const ProjectDetail = () => {
                       </div>
                       
                       <div>
-                        <label className="text-sm font-medium text-slate-700">Created</label>
+                        <label className="text-sm font-medium text-slate-700">Issued</label>
                         <p className="text-slate-900">{format(new Date(invoice.created_at), 'MMM d, yyyy')}</p>
                       </div>
+                    </div>
+                    
+                    {invoice.details && (
+                      <div className="mt-4">
+                        <label className="text-sm font-medium text-slate-700">Line Items</label>
+                        <div className="mt-1 space-y-1">
+                          {invoice.details.line_items?.map((item, index) => (
+                            <div key={index} className="flex justify-between text-sm">
+                              <span className="text-slate-600">{item.description}</span>
+                              <span className="text-slate-900 font-medium">${item.amount}</span>
+                            </div>
+                          ))}
+                        </div>
+                        <div className="mt-2 pt-2 border-t border-slate-200">
+                          <div className="flex justify-between font-medium">
+                            <span>Total Due:</span>
+                            <span className="text-lg">${invoice.details.total_due}</span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    
+                    <div className="mt-4 flex items-center space-x-3">
+                      <Button className="bg-gradient-to-r from-green-500 to-emerald-600">
+                        <Send className="w-4 h-4 mr-2" />
+                        Send Invoice
+                      </Button>
+                      <Button variant="outline">
+                        <Download className="w-4 h-4 mr-2" />
+                        Download PDF
+                      </Button>
                     </div>
                   </div>
                 ))}
