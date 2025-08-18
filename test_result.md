@@ -121,7 +121,17 @@ backend:
           comment: "CLAUDE INTEGRATION FULLY WORKING! Fixed critical JSON parsing issue where Claude responses were wrapped in markdown code blocks. Added clean_claude_response() helper function to strip ```json formatting. Fixed user lookup issue in contract/invoice generation. All three AI endpoints now working perfectly: 1) POST /api/intake/parse-email - Successfully extracts client info, project details, budget, timeline with high confidence scores. 2) POST /api/contracts/generate - Generates comprehensive contract variables including payment terms, milestones, legal details. 3) POST /api/invoices/create - Creates detailed invoices with line items, payment info, due dates. Claude-4-sonnet-20250514 model responding excellently with structured data. All basic CRUD operations also working (auth, clients, projects, dashboard). 100% test success rate achieved."
 
 frontend:
-  - task: "Responsive Design Audit"
+  - task: "Streamline Workflow & Remove Manual Client Creation"
+    implemented: true
+    working: true
+    file: "frontend/src/pages/Clients.js, backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "main"
+          comment: "WORKFLOW STREAMLINED! 1) Removed 'Add Client' button from Clients page - clients now only created through email processing workflow. 2) Updated Clients page description to clarify clients come from email processing. 3) Updated empty state to direct users to Inbox for email processing instead of manual client creation. 4) Added comment to backend client creation endpoint indicating it's for internal use. 5) Verified delete project functionality exists with three-dot hover menu on project cards. The workflow is now: Inbox (process emails) → Projects (manage & delete) → Contracts/Invoices. Clean and intuitive user experience."
     implemented: true
     working: true
     file: "frontend/src/**"
