@@ -28,7 +28,7 @@ import { format } from 'date-fns';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
-const ProjectDetail = () => {
+const ProjectDetail = ({ user }) => {
   const { id } = useParams();
   const [project, setProject] = useState(null);
   const [client, setClient] = useState(null);
