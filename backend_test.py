@@ -508,6 +508,13 @@ def main():
     tester.test_dashboard_work_queue()
     tester.test_agent_activity()
     
+    # PDF Generation Tests
+    print("\n📄 PDF GENERATION TESTS")
+    tester.test_contract_pdf_download()
+    tester.test_invoice_pdf_download()
+    tester.test_nonexistent_contract_pdf()
+    tester.test_nonexistent_invoice_pdf()
+    
     # Print Results
     print("\n" + "=" * 50)
     print(f"📊 FINAL RESULTS")
