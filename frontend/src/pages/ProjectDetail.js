@@ -547,7 +547,7 @@ ${contract.variables.freelancer_email}`);
                   <div>
                     <label className="text-sm font-medium text-slate-700">Project Timeline</label>
                     {editingContract ? (
-                      <div className="grid grid-cols-2 gap-2">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         <Input
                           type="date"
                           value={contractEdits.start_date || ''}
