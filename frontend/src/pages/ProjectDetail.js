@@ -300,6 +300,18 @@ ${user.email}`);
     window.open(mailtoLink);
   };
 
+  const handleDownloadContract = () => {
+    if (!contract) return;
+    const downloadUrl = `${BACKEND_URL}/api/contracts/${contract.id}/pdf`;
+    window.open(downloadUrl, '_blank');
+  };
+
+  const handleDownloadInvoice = (invoiceId) => {
+    if (!invoiceId) return;
+    const downloadUrl = `${BACKEND_URL}/api/invoices/${invoiceId}/pdf`;
+    window.open(downloadUrl, '_blank');
+  };
+
   if (loading) {
     return (
       <div className="space-y-6 animate-pulse">
