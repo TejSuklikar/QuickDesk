@@ -199,8 +199,8 @@ Please process payment at your earliest convenience. If you have any questions a
 Thank you for your business!
 
 Best regards,
-${user?.name || 'Freelancer'}
-${user?.email || 'freelancer@example.com'}`);
+${contract?.variables?.freelancer_name || 'Freelancer'}
+${contract?.variables?.freelancer_email || 'freelancer@example.com'}`);
     
     const mailtoLink = `mailto:${client.email}?subject=${subject}&body=${body}`;
     window.open(mailtoLink);
