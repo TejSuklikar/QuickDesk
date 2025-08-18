@@ -171,23 +171,23 @@ const Projects = () => {
           const client = getClientById(project.client_id);
           
           return (
-            <Link key={project.id} to={`/projects/${project.id}`}>
-              <Card className="p-6 hover-lift transition-all duration-200 group cursor-pointer">
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex items-center space-x-3">
-                    <div className="p-2 bg-slate-100 rounded-lg group-hover:bg-blue-100 transition-colors">
-                      <FolderOpen className="w-5 h-5 text-slate-600 group-hover:text-blue-600" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-slate-900 truncate group-hover:text-blue-600 transition-colors">
-                        {project.title}
-                      </h3>
-                      <p className="text-sm text-slate-600">
-                        {client?.name || 'Unknown Client'}
-                      </p>
-                    </div>
+            <Card key={project.id} className="p-6 hover-lift transition-all duration-200 group">
+              <div className="flex items-start justify-between mb-4">
+                <Link to={`/projects/${project.id}`} className="flex items-center space-x-3 flex-1">
+                  <div className="p-2 bg-slate-100 rounded-lg group-hover:bg-blue-100 transition-colors">
+                    <FolderOpen className="w-5 h-5 text-slate-600 group-hover:text-blue-600" />
                   </div>
-                  
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-semibold text-slate-900 truncate group-hover:text-blue-600 transition-colors">
+                      {project.title}
+                    </h3>
+                    <p className="text-sm text-slate-600">
+                      {client?.name || 'Unknown Client'}
+                    </p>
+                  </div>
+                </Link>
+                
+                <div className="flex items-center space-x-2">
                   <div className="flex flex-col items-end space-y-1">
                     <Badge className={`${getStatusColor(project.status)} flex items-center space-x-1`}>
                       {getStatusIcon(project.status)}
@@ -203,8 +203,27 @@ const Projects = () => {
                       <span className="text-xs text-purple-600 font-medium">Awaiting Payment</span>
                     )}
                   </div>
+                  
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="sm" className="opacity-0 group-hover:opacity-100 transition-opacity">
+                        <MoreHorizontal className="w-4 h-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem 
+                        onClick={() => handleDeleteProject(project.id)}
+                        className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                      >
+                        <Trash2 className="w-4 h-4 mr-2" />
+                        Delete Project
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
+              </div>
 
+              <Link to={`/projects/${project.id}`}>
                 <p className="text-sm text-slate-600 mb-4 line-clamp-2">
                   {project.description}
                 </p>
@@ -274,8 +293,8 @@ const Projects = () => {
                     />
                   </div>
                 </div>
-              </Card>
-            </Link>
+              </Link>
+            </Card>
           );
         })}
       </div>
