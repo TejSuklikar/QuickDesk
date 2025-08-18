@@ -376,7 +376,9 @@ class BillingAgent:
             user_message = UserMessage(text=prompt)
             response = await self.llm.send_message(user_message)
             
-            result = json.loads(response)
+            # Clean and parse JSON response
+            cleaned_response = clean_claude_response(response)
+            result = json.loads(cleaned_response)
             # Ensure amounts are correct
             result["total_due"] = amount
             result["subtotal"] = amount
