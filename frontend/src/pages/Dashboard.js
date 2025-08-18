@@ -17,7 +17,6 @@ import { Card } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
 import axios from 'axios';
-import { format } from 'date-fns';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -249,7 +248,12 @@ const Dashboard = () => {
                         {event.entity_type} • {event.entity_id.substring(0, 8)}...
                       </p>
                       <p className="text-xs text-slate-500">
-                        {format(new Date(event.created_at), 'MMM d, h:mm a')}
+                        {new Date(event.created_at).toLocaleDateString('en-US', { 
+  month: 'short', 
+  day: 'numeric', 
+  hour: 'numeric', 
+  minute: '2-digit' 
+})}
                       </p>
                     </div>
                   </div>
