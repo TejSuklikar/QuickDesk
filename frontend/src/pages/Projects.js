@@ -255,7 +255,7 @@ const Projects = () => {
                 <div className="mt-4 pt-4 border-t border-slate-100">
                   <div className="flex justify-between items-center mb-2">
                     <span className="text-xs text-slate-600">Progress</span>
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center space-x-2 flex-shrink-0">
                       <span className="text-xs text-slate-500">
                         {project.status === 'Done' ? '100%' : 
                          project.status === 'Billing' ? '75%' : 
@@ -263,21 +263,21 @@ const Projects = () => {
                       </span>
                       {project.status === 'Intake' && (
                         <Link to={`/projects/${project.id}`}>
-                          <Button size="xs" className="text-xs px-2 py-1 h-6 bg-amber-500 hover:bg-amber-600">
+                          <Button size="xs" className="text-xs px-2 py-1 h-6 bg-amber-500 hover:bg-amber-600 whitespace-nowrap">
                             Generate Contract
                           </Button>
                         </Link>
                       )}
                       {project.status === 'Contract' && (
                         <Link to={`/projects/${project.id}`}>
-                          <Button size="xs" className="text-xs px-2 py-1 h-6 bg-blue-500 hover:bg-blue-600">
+                          <Button size="xs" className="text-xs px-2 py-1 h-6 bg-blue-500 hover:bg-blue-600 whitespace-nowrap">
                             Create Invoice
                           </Button>
                         </Link>
                       )}
                       {project.status === 'Billing' && (
                         <Link to={`/projects/${project.id}`}>
-                          <Button size="xs" className="text-xs px-2 py-1 h-6 bg-purple-500 hover:bg-purple-600">
+                          <Button size="xs" className="text-xs px-2 py-1 h-6 bg-purple-500 hover:bg-purple-600 whitespace-nowrap">
                             Send Reminder
                           </Button>
                         </Link>
