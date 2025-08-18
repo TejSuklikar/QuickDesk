@@ -442,9 +442,12 @@ ${contract.variables.freelancer_email}`);
                 </div>
                 
                 <div className="flex items-center space-x-3">
-                  <Button className="bg-gradient-to-r from-green-500 to-emerald-600">
+                  <Button 
+                    onClick={handleSendContract}
+                    className="bg-gradient-to-r from-green-500 to-emerald-600"
+                  >
                     <Send className="w-4 h-4 mr-2" />
-                    Send for Signature
+                    Send to Client
                   </Button>
                   <Button variant="outline">
                     <Download className="w-4 h-4 mr-2" />
