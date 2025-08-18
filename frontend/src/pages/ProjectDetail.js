@@ -749,7 +749,7 @@ ${contract.variables.freelancer_email}`);
                       </Badge>
                     </div>
                     
-                    <div className="grid grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                       <div>
                         <label className="text-sm font-medium text-slate-700">Amount</label>
                         <p className="text-slate-900 font-medium">${invoice.amount}</p>
