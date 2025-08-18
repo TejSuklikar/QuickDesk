@@ -218,14 +218,16 @@ const Clients = () => {
           <p className="text-slate-600 mb-4">
             {searchTerm 
               ? 'Try adjusting your search criteria'
-              : 'Get started by adding your first client'
+              : 'Clients will appear here when you process emails in the Inbox'
             }
           </p>
           {!searchTerm && (
-            <Button className="bg-gradient-to-r from-blue-500 to-purple-600">
-              <Plus className="w-4 h-4 mr-2" />
-              Add Client
-            </Button>
+            <Link to="/inbox">
+              <Button className="bg-gradient-to-r from-blue-500 to-purple-600">
+                <Mail className="w-4 h-4 mr-2" />
+                Process Client Emails
+              </Button>
+            </Link>
           )}
         </Card>
       )}
