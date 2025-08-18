@@ -26,6 +26,6 @@
   "env": {
     "MONGO_URL": "@mongo-url",
     "DB_NAME": "@db-name",
-    "EMERGENT_LLM_KEY": "@emergent-llm-key"
+    "CLAUDE_API_KEY": "@claude-api-key"
   }
 }
