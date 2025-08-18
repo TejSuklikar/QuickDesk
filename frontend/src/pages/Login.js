@@ -49,15 +49,6 @@ const Login = ({ onLogin }) => {
     }
   };
 
-  // Demo login for MVP
-  const handleDemoLogin = () => {
-    onLogin({
-      id: 'demo_user',
-      name: 'Demo User',
-      email: 'demo@freeflow.ai'
-    });
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-100 via-white to-blue-50 flex items-center justify-center px-4">
       <div className="max-w-md w-full space-y-8">
