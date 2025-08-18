@@ -1034,7 +1034,7 @@ async def get_agent_activity(limit: int = 50):
     events = await db.agent_events.find().sort("created_at", -1).limit(limit).to_list(limit)
     return [AgentEvent(**event) for event in events]
 
-# Webhook endpoints (mock implementations)
+# Webhook endpoints
 @api_router.post("/webhooks/stripe")
 async def stripe_webhook():
     """Handle Stripe webhooks"""
