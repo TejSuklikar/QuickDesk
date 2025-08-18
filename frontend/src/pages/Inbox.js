@@ -212,7 +212,7 @@ Acme Corporation`;
         </div>
       </Card>
 
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Left Panel - Raw Message Input */}
         <div className="space-y-6">
           <Card className="p-6">
