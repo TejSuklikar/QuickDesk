@@ -82,6 +82,20 @@ const Projects = () => {
     }
   };
 
+  const handleDeleteProject = async (projectId) => {
+    if (window.confirm('Are you sure you want to delete this project? This action cannot be undone.')) {
+      try {
+        await axios.delete(`${BACKEND_URL}/api/projects/${projectId}`);
+        // Remove from local state
+        setProjects(projects.filter(p => p.id !== projectId));
+        alert('Project deleted successfully!');
+      } catch (error) {
+        console.error('Error deleting project:', error);
+        alert('Error deleting project. Please try again.');
+      }
+    }
+  };
+
   const filteredProjects = projects.filter(project => {
     const client = getClientById(project.client_id);
     const matchesSearch = project.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
