@@ -276,6 +276,8 @@ ${user.email}`);
     const downloadUrl = `${BACKEND_URL}/api/invoices/${invoiceId}/pdf`;
     window.open(downloadUrl, '_blank');
   };
+
+  const handleSendContract = () => {
     if (!contract || !client || !user) return;
     
     const subject = encodeURIComponent(`Contract for ${project.title} - Ready for Signature`);
