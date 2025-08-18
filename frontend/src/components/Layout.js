@@ -70,7 +70,7 @@ const Layout = ({ children, user, onLogout }) => {
                 <Icon className={`w-5 h-5 ${active ? 'text-blue-600' : 'text-slate-500'}`} />
                 <div className="flex-1">
                   <div className="font-medium">{item.name}</div>
-                  <div className="text-xs text-slate-500 group-hover:text-slate-600">
+                  <div className="text-xs text-slate-500">
                     {item.description}
                   </div>
                 </div>
