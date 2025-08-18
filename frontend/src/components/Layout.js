@@ -59,10 +59,10 @@ const Layout = ({ children, user, onLogout }) => {
               to={item.href}
               onClick={() => setSidebarOpen(false)}
               className={`
-                group flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-colors
+                flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium
                 ${active 
                   ? 'bg-blue-50 text-blue-700 shadow-sm' 
-                  : 'text-slate-700 hover:text-slate-900 hover:bg-slate-50'
+                  : 'text-slate-700'
                 }
               `}
             >
