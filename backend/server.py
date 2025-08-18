@@ -346,7 +346,7 @@ class BillingAgent:
             }
             
             Generate realistic line items that add up to the project total."""
-        ).with_model("openai", "gpt-4o-mini")
+        ).with_model("anthropic", "claude-4-sonnet-20250514")
     
     async def create_invoice_details(self, project_data: Dict[str, Any], amount: float, user_data: Dict[str, Any] = None) -> Dict[str, Any]:
         try:
