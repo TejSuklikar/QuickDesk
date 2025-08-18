@@ -499,29 +499,87 @@ def generate_contract_pdf(variables: Dict[str, Any], output_path: str):
     buffer.seek(0)
     return buffer.getvalue()
 
-def generate_invoice_pdf(invoice_data: Dict[str, Any], output_path: str):
-    """Generate invoice PDF using ReportLab"""
+def generate_invoice_pdf(invoice_data: Dict[str, Any], client_data: Dict[str, Any], freelancer_data: Dict[str, Any], output_path: str):
+    """Generate invoice PDF using your custom template"""
     buffer = io.BytesIO()
-    doc = SimpleDocTemplate(buffer, pagesize=letter)
+    doc = SimpleDocTemplate(buffer, pagesize=letter, topMargin=1*inch)
     styles = getSampleStyleSheet()
     story = []
     
     # Title
-    title_style = ParagraphStyle('CustomTitle', parent=styles['Heading1'], fontSize=24, spaceAfter=30)
+    title_style = ParagraphStyle('InvoiceTitle', parent=styles['Heading1'], 
+                                fontSize=18, spaceAfter=20, alignment=1)
     story.append(Paragraph("INVOICE", title_style))
     story.append(Spacer(1, 20))
     
-    # Invoice content
-    content = f"""
-    <b>Invoice #:</b> {invoice_data.get('id', 'N/A')}<br/>
-    <b>Amount:</b> ${invoice_data.get('amount', 0):,.2f}<br/>
-    <b>Due Date:</b> {invoice_data.get('due_date', 'N/A')}<br/>
-    <b>Status:</b> {invoice_data.get('status', 'N/A')}<br/><br/>
+    # Invoice header info
+    header_style = ParagraphStyle('InvoiceHeader', parent=styles['Normal'], 
+                                 fontSize=11, spaceAfter=8)
     
-    <b>Description:</b> Professional services rendered<br/>
+    header_text = f"""
+    Invoice Number: {invoice_data.get('invoice_number', 'N/A')}<br/>
+    Date Issued: {invoice_data.get('issue_date', 'N/A')}<br/>
+    Due Date: {invoice_data.get('due_date', 'N/A')}<br/>
     """
+    story.append(Paragraph(header_text, header_style))
+    story.append(Spacer(1, 20))
     
-    story.append(Paragraph(content, styles['Normal']))
+    # Bill To and From
+    parties_style = ParagraphStyle('Parties', parent=styles['Normal'], 
+                                  fontSize=11, spaceAfter=12)
+    
+    parties_text = f"""
+    <b>Bill To:</b><br/>
+    {client_data.get('name', 'N/A')}<br/>
+    {client_data.get('company', '')}<br/>
+    {client_data.get('email', 'N/A')}<br/><br/>
+    
+    <b>From:</b><br/>
+    {freelancer_data.get('name', 'N/A')}<br/>
+    {freelancer_data.get('business', 'N/A')}<br/>
+    {freelancer_data.get('email', 'N/A')}<br/>
+    """
+    story.append(Paragraph(parties_text, parties_style))
+    story.append(Spacer(1, 20))
+    
+    # Project info
+    project_text = f"""
+    <b>Project:</b> {invoice_data.get('project_title', 'N/A')}<br/>
+    Description: {invoice_data.get('project_description', 'N/A')}<br/>
+    """
+    story.append(Paragraph(project_text, parties_style))
+    story.append(Spacer(1, 20))
+    
+    # Line Items
+    line_items_text = "<b>Line Items:</b><br/>"
+    line_items = invoice_data.get('line_items', [])
+    for i, item in enumerate(line_items, 1):
+        line_items_text += f"{i}. {item.get('description', 'N/A')} — ${item.get('amount', 0):,.2f}<br/>"
+    
+    story.append(Paragraph(line_items_text, parties_style))
+    story.append(Spacer(1, 15))
+    
+    # Totals
+    totals_text = f"""
+    <b>Subtotal:</b> ${invoice_data.get('subtotal', 0):,.2f}<br/>
+    <b>Tax ({invoice_data.get('tax_rate', 0)}%):</b> ${invoice_data.get('tax_amount', 0):,.2f}<br/>
+    <b>Total Due:</b> <b>${invoice_data.get('total_due', 0):,.2f}</b><br/>
+    """
+    story.append(Paragraph(totals_text, parties_style))
+    story.append(Spacer(1, 20))
+    
+    # Payment instructions
+    payment_text = f"""
+    <b>Payment Instructions:</b><br/>
+    Please pay via {invoice_data.get('payment_platform', 'Stripe')} using the following link:<br/>
+    {invoice_data.get('payment_link', 'Payment link will be provided')}<br/><br/>
+    
+    Payment is due within {invoice_data.get('net_terms', '30')} days of invoice date. 
+    Late payments may incur a fee of {invoice_data.get('late_fee', '1.5')}%.<br/><br/>
+    
+    Thank you for your business!
+    """
+    story.append(Paragraph(payment_text, parties_style))
     
     doc.build(story)
     buffer.seek(0)
