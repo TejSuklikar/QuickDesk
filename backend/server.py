@@ -1024,6 +1024,9 @@ async def download_invoice_pdf(invoice_id: str):
             headers={"Content-Disposition": f"attachment; filename=invoice_{invoice_id[:8]}.pdf"}
         )
         
+    except HTTPException:
+        # Re-raise HTTPExceptions (like 404) without modification
+        raise
     except Exception as e:
         logger.error(f"Invoice PDF generation error: {e}")
         raise HTTPException(status_code=500, detail="Invoice PDF generation failed")
