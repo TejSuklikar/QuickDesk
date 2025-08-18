@@ -181,7 +181,7 @@ class IntakeResult(BaseModel):
 class IntakeAgent:
     def __init__(self):
         self.llm = LlmChat(
-            api_key=os.environ['EMERGENT_LLM_KEY'],
+            api_key=os.environ['CLAUDE_API_KEY'],
             session_id="intake_agent",
             system_message="""You are an AI intake agent for a freelancer workflow system. 
             Your job is to extract structured information from raw client inquiries.
