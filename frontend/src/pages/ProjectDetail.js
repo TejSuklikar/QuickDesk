@@ -804,7 +804,7 @@ ${contract.variables.freelancer_email}`);
                               <label className="text-xs text-slate-600">Line Items</label>
                               <div className="space-y-2">
                                 {(invoiceEdits.line_items || []).map((item, index) => (
-                                  <div key={index} className="grid grid-cols-3 gap-2">
+                                  <div key={index} className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                                     <Input
                                       placeholder="Description"
                                       value={item.description || ''}
@@ -813,7 +813,7 @@ ${contract.variables.freelancer_email}`);
                                         newItems[index] = { ...newItems[index], description: e.target.value };
                                         setInvoiceEdits(prev => ({ ...prev, line_items: newItems }));
                                       }}
-                                      className="col-span-2"
+                                      className="sm:col-span-2"
                                     />
                                     <Input
                                       type="number"
