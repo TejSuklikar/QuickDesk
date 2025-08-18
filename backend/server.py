@@ -319,7 +319,7 @@ class ContractAgent:
 class BillingAgent:
     def __init__(self):
         self.llm = LlmChat(
-            api_key=os.environ['EMERGENT_LLM_KEY'],
+            api_key=os.environ['CLAUDE_API_KEY'],
             session_id="billing_agent",
             system_message="""You are an AI billing agent. Create professional invoices.
             
