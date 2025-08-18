@@ -70,37 +70,42 @@ const Dashboard = () => {
     }
   };
 
-  const StatusTile = ({ title, count, progress, color, icon: Icon, description }) => (
-    <Card className="p-6 hover-lift transition-all duration-200 group">
-      <div className="flex items-center justify-between mb-4">
-        <div className={`p-3 rounded-xl ${color} text-white`}>
-          <Icon className="w-6 h-6" />
+  const StatusTile = ({ title, count, progress, color, icon: Icon, description }) => {
+    // Calculate accurate progress based on project count
+    const actualProgress = count === 0 ? 0 : Math.min(100, (count / Math.max(count, 1)) * 100);
+    
+    return (
+      <Card className="p-6 hover-lift transition-all duration-200 group">
+        <div className="flex items-center justify-between mb-4">
+          <div className={`p-3 rounded-xl ${color} text-white`}>
+            <Icon className="w-6 h-6" />
+          </div>
+          <div className="text-right">
+            <div className="text-2xl font-bold text-slate-900">{count}</div>
+            <div className="text-sm text-slate-500">{title}</div>
+          </div>
         </div>
-        <div className="text-right">
-          <div className="text-2xl font-bold text-slate-900">{count}</div>
-          <div className="text-sm text-slate-500">{title}</div>
+        
+        <div className="mb-3">
+          <div className="flex justify-between text-xs mb-1">
+            <span className="text-slate-600">{description}</span>
+            <span className="text-slate-500">{count > 0 ? `${count} active` : 'No activity'}</span>
+          </div>
+          <div className="progress-bar">
+            <div 
+              className={`progress-fill ${title.toLowerCase()}`}
+              style={{ width: count > 0 ? '100%' : '0%' }}
+            />
+          </div>
         </div>
-      </div>
-      
-      <div className="mb-3">
-        <div className="flex justify-between text-xs mb-1">
-          <span className="text-slate-600">{description}</span>
-          <span className="text-slate-500">{progress}%</span>
+        
+        <div className="flex items-center text-xs text-slate-500 group-hover:text-slate-700 transition-colors">
+          <TrendingUp className="w-3 h-3 mr-1" />
+          {count > 0 ? 'Projects in progress' : 'Ready for new projects'}
         </div>
-        <div className="progress-bar">
-          <div 
-            className={`progress-fill ${title.toLowerCase()}`}
-            style={{ width: `${progress}%` }}
-          />
-        </div>
-      </div>
-      
-      <div className="flex items-center text-xs text-slate-500 group-hover:text-slate-700 transition-colors">
-        <TrendingUp className="w-3 h-3 mr-1" />
-        Active projects
-      </div>
-    </Card>
-  );
+      </Card>
+    );
+  };
 
   if (loading) {
     return (
