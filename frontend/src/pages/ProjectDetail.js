@@ -50,11 +50,11 @@ const ProjectDetail = ({ user }) => {
       setLoading(true);
       
       // Load project
-      const projectRes = await axios.get(`${BACKEND_URL}/api/projects/${id}`);
+      const projectRes = await axios.get(`${BACKEND_URL}/api/projects/${id}`, {headers: { 'X-User-ID': user.id }});
       setProject(projectRes.data);
       
       // Load client
-      const clientRes = await axios.get(`${BACKEND_URL}/api/clients/${projectRes.data.client_id}`);
+      const clientRes = await axios.get(`${BACKEND_URL}/api/clients/${projectRes.data.client_id}`, {headers: { 'X-User-ID': user.id }});
       setClient(clientRes.data);
       
       // Try to load contract and invoices (they might not exist yet)

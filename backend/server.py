@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter, HTTPException, BackgroundTasks, Response
+from fastapi import FastAPI, APIRouter, HTTPException, BackgroundTasks, Response, Header
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -11,7 +11,6 @@ import uuid
 from datetime import datetime, timedelta
 from enum import Enum
 import asyncio
-from emergentintegrations.llm.chat import LlmChat, UserMessage
 from reportlab.lib.pagesizes import letter, A4
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
@@ -118,6 +117,7 @@ class Project(BaseModel):
     budget: Optional[float] = None
     timeline: Optional[str] = None
     status: ProjectStatus = ProjectStatus.INTAKE
+    owner_id: str
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
 class ProjectCreate(BaseModel):
@@ -177,237 +177,10 @@ class IntakeResult(BaseModel):
     confidence: Dict[str, float]
     status: str
 
-# Helper function to clean Claude responses
-def clean_claude_response(response: str) -> str:
-    """Remove markdown code blocks from Claude responses"""
-    response = response.strip()
-    if response.startswith('```json'):
-        response = response[7:]  # Remove ```json
-    elif response.startswith('```'):
-        response = response[3:]   # Remove ```
-    if response.endswith('```'):
-        response = response[:-3]  # Remove trailing ```
-    return response.strip()
-
-# AI Agent Classes
-class IntakeAgent:
-    def __init__(self):
-        self.llm = LlmChat(
-            api_key=os.environ['CLAUDE_API_KEY'],
-            session_id="intake_agent",
-            system_message="""You are an AI intake agent for a freelancer workflow system. 
-            Your job is to extract structured information from raw client inquiries.
-            
-            Extract and return JSON with this exact structure:
-            {
-                "client": {
-                    "name": "extracted name",
-                    "email": "extracted email", 
-                    "company": "extracted company if mentioned"
-                },
-                "project": {
-                    "title": "project title",
-                    "description": "project description",
-                    "timeline": "extracted timeline",
-                    "budget": "extracted budget amount as number or null"
-                },
-                "confidence": {
-                    "budget": 0.0-1.0,
-                    "timeline": 0.0-1.0
-                },
-                "status": "intake_complete" or "needs_more_info"
-            }
-            
-            Be thorough but concise. If information is missing or unclear, set confidence scores lower."""
-        ).with_model("anthropic", "claude-4-sonnet-20250514")
-    
-    async def process_inquiry(self, raw_text: str) -> Dict[str, Any]:
-        try:
-            user_message = UserMessage(text=f"Extract project information from this inquiry: {raw_text}")
-            response = await self.llm.send_message(user_message)
-            
-            # Clean and parse JSON response
-            cleaned_response = clean_claude_response(response)
-            result = json.loads(cleaned_response)
-            return result
-        except Exception as e:
-            logger.error(f"Intake agent error: {e}")
-            return {
-                "client": {"name": "", "email": "", "company": ""},
-                "project": {"title": "", "description": raw_text, "timeline": "", "budget": None},
-                "confidence": {"budget": 0.0, "timeline": 0.0},
-                "status": "needs_more_info"
-            }
-
-class ContractAgent:
-    def __init__(self):
-        self.llm = LlmChat(
-            api_key=os.environ['CLAUDE_API_KEY'],
-            session_id="contract_agent",
-            system_message="""You are an AI contract agent. Generate professional freelance contract variables.
-            
-            Return JSON with these exact contract variables:
-            {
-                "client_name": "client full name",
-                "client_company": "company name or 'Individual' if none",
-                "client_email": "client email address",
-                "freelancer_name": "John Smith",
-                "freelancer_business": "Smith Digital Services",
-                "project_description": "detailed description of work to be performed",
-                "deliverables_list": ["specific deliverable 1", "specific deliverable 2", "specific deliverable 3"],
-                "start_date": "YYYY-MM-DD format",
-                "end_date": "YYYY-MM-DD format",
-                "milestone_1": "First milestone with deadline",
-                "milestone_2": "Second milestone with deadline", 
-                "milestone_3": "Third milestone with deadline",
-                "project_budget": 0,
-                "payment_terms": "50% upfront, 50% on completion",
-                "invoice_platform": "email",
-                "net_terms": "30",
-                "late_fee": "1.5",
-                "jurisdiction": "State of California"
-            }
-            
-            Generate realistic milestones, payment terms, and deadlines based on the project scope and timeline."""
-        ).with_model("anthropic", "claude-4-sonnet-20250514")
-    
-    async def generate_contract_variables(self, project_data: Dict[str, Any], client_data: Dict[str, Any], user_data: Dict[str, Any]) -> Dict[str, Any]:
-        try:
-            prompt = f"""Generate contract variables for this freelance project:
-            
-            Client Information:
-            - Name: {client_data.get('name', 'Unknown')}
-            - Email: {client_data.get('email', 'unknown@email.com')}
-            - Company: {client_data.get('company', 'Individual')}
-            
-            Freelancer Information:
-            - Name: {user_data.get('name', 'Freelancer')}
-            - Email: {user_data.get('email', 'freelancer@email.com')}
-            
-            Project Information:
-            - Title: {project_data.get('title', 'Untitled Project')}
-            - Description: {project_data.get('description', 'No description provided')}
-            - Budget: ${project_data.get('budget', 0)}
-            - Timeline: {project_data.get('timeline', 'Not specified')}
-            
-            Generate professional contract variables with realistic milestones and payment terms.
-            Use the actual freelancer name and create a business name if not provided.
-            """
-            user_message = UserMessage(text=prompt)
-            response = await self.llm.send_message(user_message)
-            
-            # Clean and parse JSON response
-            cleaned_response = clean_claude_response(response)
-            return json.loads(cleaned_response)
-        except Exception as e:
-            logger.error(f"Contract agent error: {e}")
-            # Enhanced fallback with actual user data
-            freelancer_business = f"{user_data.get('name', 'Freelancer').split()[0]} Digital Services"
-            
-            return {
-                "client_name": client_data.get("name", "Client Name"),
-                "client_company": client_data.get("company", "Individual"),
-                "client_email": client_data.get("email", "client@example.com"),
-                "freelancer_name": user_data.get("name", "Freelancer"),
-                "freelancer_business": freelancer_business,
-                "freelancer_email": user_data.get("email", "freelancer@example.com"),
-                "project_description": project_data.get("description", "Professional services as described"),
-                "deliverables_list": [
-                    "Project planning and requirements analysis",
-                    "Development and implementation", 
-                    "Testing and quality assurance",
-                    "Final delivery and documentation"
-                ],
-                "start_date": datetime.utcnow().strftime("%Y-%m-%d"),
-                "end_date": (datetime.utcnow() + timedelta(days=30)).strftime("%Y-%m-%d"),
-                "milestone_1": "Project kickoff and requirements - Week 1",
-                "milestone_2": "Development phase completion - Week 3",
-                "milestone_3": "Final delivery and testing - Week 4",
-                "project_budget": project_data.get("budget", 0),
-                "payment_terms": "50% upfront, 50% on completion",
-                "invoice_platform": "email",
-                "net_terms": "30",
-                "late_fee": "1.5",
-                "jurisdiction": "State of California"
-            }
-
-class BillingAgent:
-    def __init__(self):
-        self.llm = LlmChat(
-            api_key=os.environ['CLAUDE_API_KEY'],
-            session_id="billing_agent",
-            system_message="""You are an AI billing agent. Create professional invoices.
-            
-            Return JSON for invoice details with this exact structure:
-            {
-                "invoice_number": "INV-YYYY-XXXX",
-                "issue_date": "YYYY-MM-DD",
-                "due_date": "YYYY-MM-DD",
-                "project_title": "project name",
-                "project_description": "brief project description", 
-                "line_items": [
-                    {"description": "item description", "amount": 0.00},
-                    {"description": "item description", "amount": 0.00},
-                    {"description": "item description", "amount": 0.00}
-                ],
-                "subtotal": 0.00,
-                "tax_rate": 0.00,
-                "tax_amount": 0.00,
-                "total_due": 0.00,
-                "payment_platform": "Stripe",
-                "payment_link": "https://pay.stripe.com/...",
-                "net_terms": "30",
-                "late_fee": "1.5"
-            }
-            
-            Generate realistic line items that add up to the project total."""
-        ).with_model("anthropic", "claude-4-sonnet-20250514")
-    
-    async def create_invoice_details(self, project_data: Dict[str, Any], amount: float, user_data: Dict[str, Any] = None) -> Dict[str, Any]:
-        try:
-            prompt = f"""Create invoice details for this project:
-            Project: {project_data.get('title', 'Untitled Project')}
-            Description: {project_data.get('description', 'Professional services')}
-            Total Amount: ${amount}
-            
-            Break down the total amount into 2-3 realistic line items that add up to ${amount}.
-            Generate a professional invoice number and set due date 30 days from now.
-            """
-            user_message = UserMessage(text=prompt)
-            response = await self.llm.send_message(user_message)
-            
-            # Clean and parse JSON response
-            cleaned_response = clean_claude_response(response)
-            result = json.loads(cleaned_response)
-            # Ensure amounts are correct
-            result["total_due"] = amount
-            result["subtotal"] = amount
-            return result
-            
-        except Exception as e:
-            logger.error(f"Billing agent error: {e}")
-            # Enhanced fallback
-            invoice_number = f"INV-{datetime.utcnow().strftime('%Y')}-{datetime.utcnow().strftime('%m%d')}"
-            return {
-                "invoice_number": invoice_number,
-                "issue_date": datetime.utcnow().strftime("%Y-%m-%d"),
-                "due_date": (datetime.utcnow() + timedelta(days=30)).strftime("%Y-%m-%d"),
-                "project_title": project_data.get("title", "Professional Services"),
-                "project_description": project_data.get("description", "Professional services rendered"),
-                "line_items": [
-                    {"description": "Project development and implementation", "amount": amount * 0.6},
-                    {"description": "Testing and quality assurance", "amount": amount * 0.3},
-                    {"description": "Final delivery and support", "amount": amount * 0.1}
-                ],
-                "subtotal": amount,
-                "tax_rate": 0.00,
-                "tax_amount": 0.00,
-                "total_due": amount,
-                "payment_platform": "Stripe",
-                "payment_link": "https://pay.stripe.com/invoice_link",
-                "net_terms": "30",
-                "late_fee": "1.5"
-            }
+# Import AI Agents from separate files
+from agents.intake_agent import IntakeAgent
+from agents.contract_agent import ContractAgent
+from agents.billing_agent import BillingAgent
 
 # Initialize agents
 intake_agent = IntakeAgent()
@@ -667,8 +440,11 @@ async def get_client(client_id: str):
 
 # Project endpoints
 @api_router.get("/projects", response_model=List[Project])
-async def get_projects():
-    projects = await db.projects.find().to_list(1000)
+async def get_projects(user_id: str = Header(None, alias="X-User-ID")):
+    if not user_id:
+        raise HTTPException(status_code=401, detail="User ID required")
+    # Get projects for the current user only  
+    projects = await db.projects.find({"owner_id": user_id}).to_list(1000)
     return [Project(**project) for project in projects]
 
 @api_router.post("/projects", response_model=Project)
@@ -750,21 +526,17 @@ async def parse_email_inquiry(intake_data: IntakeInput):
         raise HTTPException(status_code=500, detail="Failed to process inquiry")
 
 @api_router.post("/intake/create-manual")
-async def create_manual_intake(intake_result: IntakeResult):
+async def create_manual_intake(intake_result: IntakeResult, user_id: str = Header(None, alias="X-User-ID")):
     """Create client and project from manual intake"""
     trace_id = str(uuid.uuid4())
     
     try:
-        # In production, this would use the authenticated user ID
-        user = await db.users.find_one({})
-        if not user:
-            raise HTTPException(status_code=400, detail="No user found. Please register first.")
-        
-        user_id = user["id"]
+        if not user_id:
+            raise HTTPException(status_code=401, detail="User ID required")
         
         # Create client if not exists
         client_data = intake_result.client
-        existing_client = await db.clients.find_one({"email": client_data["email"]})
+        existing_client = await db.clients.find_one({"email": client_data["email"], "owner_id": user_id})
         
         if not existing_client:
             client = Client(
@@ -778,7 +550,7 @@ async def create_manual_intake(intake_result: IntakeResult):
         else:
             client_id = existing_client["id"]
         
-        # Create project
+        # Create project with owner_id
         project_data = intake_result.project
         project = Project(
             client_id=client_id,
@@ -786,7 +558,8 @@ async def create_manual_intake(intake_result: IntakeResult):
             description=project_data["description"],
             budget=project_data.get("budget"),
             timeline=project_data.get("timeline"),
-            status=ProjectStatus.INTAKE
+            status=ProjectStatus.INTAKE,
+            owner_id=user_id  # Now includes owner_id
         )
         await db.projects.insert_one(project.dict())
         
@@ -888,60 +661,17 @@ async def download_contract_pdf(contract_id: str):
         
         client = await db.clients.find_one({"id": project["client_id"]})
         
-        # Create PDF in memory
-        buffer = io.BytesIO()
-        doc = SimpleDocTemplate(buffer, pagesize=letter)
-        styles = getSampleStyleSheet()
-        
-        # Title style
-        title_style = ParagraphStyle(
-            'CustomTitle',
-            parent=styles['Heading1'],
-            fontSize=24,
-            spaceAfter=30,
-            textColor=colors.darkblue
-        )
-        
-        # Create content
-        content = []
-        content.append(Paragraph("SERVICE CONTRACT", title_style))
-        content.append(Spacer(1, 0.2*inch))
-        
-        # Contract details
-        vars = contract.get("variables", {})
-        contract_text = f"""
-        <b>Project:</b> {project.get('title', 'N/A')}<br/>
-        <b>Client:</b> {client.get('name', 'N/A')} - {client.get('company', 'N/A')}<br/>
-        <b>Freelancer:</b> {vars.get('freelancer_name', 'N/A')}<br/>
-        <b>Total Amount:</b> ${vars.get('project_budget', 'N/A')}<br/>
-        <b>Timeline:</b> {vars.get('start_date', 'N/A')} to {vars.get('end_date', 'N/A')}<br/>
-        <b>Payment Terms:</b> {vars.get('payment_terms', 'N/A')}<br/><br/>
-        
-        <b>Scope of Work:</b><br/>
-        {vars.get('scope_description', 'N/A')}<br/><br/>
-        
-        <b>Terms and Conditions:</b><br/>
-        {vars.get('terms_conditions', 'Standard terms and conditions apply.')}<br/><br/>
-        
-        <b>Signatures:</b><br/>
-        Client: _________________________ Date: _________<br/>
-        Freelancer: _________________________ Date: _________
-        """
-        
-        content.append(Paragraph(contract_text, styles['Normal']))
-        
-        # Build PDF
-        doc.build(content)
-        buffer.seek(0)
+        # Use the existing professional PDF generator
+        variables = contract.get("variables", {})
+        pdf_bytes = generate_contract_pdf(variables, "")
         
         return Response(
-            content=buffer.getvalue(),
+            content=pdf_bytes,
             media_type="application/pdf",
             headers={"Content-Disposition": f"attachment; filename=contract_{contract_id[:8]}.pdf"}
         )
         
     except HTTPException:
-        # Re-raise HTTPExceptions (like 404) without modification
         raise
     except Exception as e:
         logger.error(f"PDF generation error: {e}")
@@ -961,71 +691,52 @@ async def download_invoice_pdf(invoice_id: str):
             raise HTTPException(status_code=404, detail="Project not found")
         
         client = await db.clients.find_one({"id": project["client_id"]})
+        user = await db.users.find_one({"id": client["owner_id"]})
         
-        # Create PDF in memory
-        buffer = io.BytesIO()
-        doc = SimpleDocTemplate(buffer, pagesize=letter)
-        styles = getSampleStyleSheet()
+        # Prepare professional invoice data
+        invoice_details = invoice.get("details", {})
         
-        # Title style
-        title_style = ParagraphStyle(
-            'CustomTitle',
-            parent=styles['Heading1'],
-            fontSize=24,
-            spaceAfter=30,
-            textColor=colors.darkblue
-        )
+        # Create comprehensive invoice data for PDF
+        invoice_data = {
+            "invoice_number": invoice_details.get("invoice_number", f"INV-{invoice['id'][:8].upper()}"),
+            "issue_date": invoice_details.get("issue_date", datetime.utcnow().strftime("%Y-%m-%d")),
+            "due_date": invoice_details.get("due_date", invoice["due_date"].strftime("%Y-%m-%d")),
+            "project_title": project.get("title", "N/A"),
+            "project_description": project.get("description", "N/A"),
+            "line_items": invoice_details.get("line_items", []),
+            "subtotal": invoice_details.get("subtotal", invoice["amount"]),
+            "tax_rate": invoice_details.get("tax_rate", 0.0),
+            "tax_amount": invoice_details.get("tax_amount", 0.0),
+            "total_due": invoice_details.get("total_due", invoice["amount"]),
+            "payment_platform": invoice_details.get("payment_platform", "Stripe"),
+            "payment_link": invoice_details.get("payment_link", "Payment link will be provided"),
+            "payment_instructions": invoice_details.get("payment_instructions", "Please process payment according to agreed terms."),
+            "net_terms": invoice_details.get("net_terms", "30"),
+            "late_fee": invoice_details.get("late_fee", "1.5")
+        }
         
-        # Create content
-        content = []
-        content.append(Paragraph("INVOICE", title_style))
-        content.append(Spacer(1, 0.2*inch))
+        client_data = {
+            "name": client.get("name", "N/A"),
+            "company": client.get("company", ""),
+            "email": client.get("email", "N/A")
+        }
         
-        # Invoice details
-        details = invoice.get("details", {})
-        invoice_text = f"""
-        <b>Invoice Number:</b> {details.get('invoice_number', invoice['id'][:8])}<br/>
-        <b>Project:</b> {project.get('title', 'N/A')}<br/>
-        <b>Client:</b> {client.get('name', 'N/A')} - {client.get('company', 'N/A')}<br/>
-        <b>Issue Date:</b> {details.get('issue_date', 'N/A')}<br/>
-        <b>Due Date:</b> {details.get('due_date', 'N/A')}<br/><br/>
+        freelancer_data = {
+            "name": user.get("name", "N/A"),
+            "business": f"{user.get('name', 'Freelancer').split()[0]} Digital Services",
+            "email": user.get("email", "N/A")
+        }
         
-        <b>Line Items:</b><br/>
-        """
-        
-        # Add line items
-        line_items = details.get("line_items", [])
-        total = 0
-        for item in line_items:
-            amount = float(item.get("amount", 0))
-            total += amount
-            invoice_text += f"• {item.get('description', 'N/A')}: ${amount:.2f}<br/>"
-        
-        invoice_text += f"""<br/>
-        <b>Subtotal:</b> ${total:.2f}<br/>
-        <b>Tax:</b> ${details.get('tax_amount', 0)}<br/>
-        <b>Total Amount Due:</b> ${invoice.get('amount', total)}<br/><br/>
-        
-        <b>Payment Instructions:</b><br/>
-        {details.get('payment_instructions', 'Please process payment according to agreed terms.')}<br/><br/>
-        
-        Thank you for your business!
-        """
-        
-        content.append(Paragraph(invoice_text, styles['Normal']))
-        
-        # Build PDF
-        doc.build(content)
-        buffer.seek(0)
+        # Use the existing professional PDF generator
+        pdf_bytes = generate_invoice_pdf(invoice_data, client_data, freelancer_data, "")
         
         return Response(
-            content=buffer.getvalue(),
+            content=pdf_bytes,
             media_type="application/pdf",
             headers={"Content-Disposition": f"attachment; filename=invoice_{invoice_id[:8]}.pdf"}
         )
         
     except HTTPException:
-        # Re-raise HTTPExceptions (like 404) without modification
         raise
     except Exception as e:
         logger.error(f"Invoice PDF generation error: {e}")
@@ -1060,7 +771,7 @@ async def create_invoice(invoice_data: InvoiceCreate):
             raise HTTPException(status_code=404, detail="User not found")
         
         # Generate invoice details using AI
-        invoice_details = await billing_agent.create_invoice_details(project, invoice_data.amount, user)
+        invoice_details = await billing_agent.generate_invoice_data(project, invoice_data.amount, invoice_data.mode)
         
         # Create invoice with enhanced structure
         invoice = Invoice(

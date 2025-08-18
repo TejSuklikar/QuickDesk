@@ -44,7 +44,8 @@ const Projects = () => {
     try {
       setLoading(true);
       const [projectsRes, clientsRes] = await Promise.all([
-        axios.get(`${BACKEND_URL}/api/projects`),
+        axios.get(`${BACKEND_URL}/api/projects`, {
+          headers: { 'X-User-ID': user.id }}),
         axios.get(`${BACKEND_URL}/api/clients`)
       ]);
       

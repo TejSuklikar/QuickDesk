@@ -85,7 +85,7 @@ Acme Corporation`;
     setProcessing(true);
     
     try {
-      const response = await axios.post(`${BACKEND_URL}/api/intake/create-manual`, extractedData);
+      const response = await axios.post(`${BACKEND_URL}/api/intake/create-manual`, extractedData, {headers: { 'X-User-ID': user.id }})
       
       if (response.data.project_id) {
         setProjectId(response.data.project_id);
