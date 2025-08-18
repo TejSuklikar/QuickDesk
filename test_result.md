@@ -120,6 +120,21 @@ backend:
           agent: "testing"
           comment: "CLAUDE INTEGRATION FULLY WORKING! Fixed critical JSON parsing issue where Claude responses were wrapped in markdown code blocks. Added clean_claude_response() helper function to strip ```json formatting. Fixed user lookup issue in contract/invoice generation. All three AI endpoints now working perfectly: 1) POST /api/intake/parse-email - Successfully extracts client info, project details, budget, timeline with high confidence scores. 2) POST /api/contracts/generate - Generates comprehensive contract variables including payment terms, milestones, legal details. 3) POST /api/invoices/create - Creates detailed invoices with line items, payment info, due dates. Claude-4-sonnet-20250514 model responding excellently with structured data. All basic CRUD operations also working (auth, clients, projects, dashboard). 100% test success rate achieved."
 
+  - task: "PDF Download Endpoints"
+    implemented: true
+    working: true
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: "NA"
+          agent: "testing"
+          comment: "Testing PDF generation endpoints for contracts and invoices as requested in review."
+        - working: true
+          agent: "testing"
+          comment: "PDF DOWNLOAD ENDPOINTS FULLY WORKING! Fixed critical bugs and successfully tested both PDF endpoints: 1) GET /api/contracts/{contract_id}/pdf - Generates and returns contract PDF with proper Content-Disposition headers for download. Fixed bug where code was looking for non-existent client_id field instead of using project_id to find client. 2) GET /api/invoices/{invoice_id}/pdf - Generates and returns invoice PDF with proper formatting and download headers. Fixed same client_id lookup bug. 3) Error handling now correctly returns 404 for non-existent contracts/invoices instead of 500 errors. 4) PDFs contain proper contract/invoice data including client info, project details, amounts, payment terms, and professional formatting. 5) Content-Type: application/pdf and Content-Disposition headers properly set for file downloads. 6) PDF format validation confirmed - files start with %PDF header. All PDF functionality working perfectly with 100% test success rate."
+
 frontend:
   - task: "Responsive Design Audit"
     implemented: true
