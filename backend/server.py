@@ -700,6 +700,21 @@ async def create_manual_intake(intake_result: IntakeResult):
     trace_id = str(uuid.uuid4())
     
     try:
+        # For MVP, we'll use the first user or create a default user
+        # In production, this would use the authenticated user ID
+        user = await db.users.find_one({})
+        if not user:
+            # Create a default user for testing
+            default_user = User(
+                name="Demo Freelancer",
+                email="demo@freelancer.com", 
+                password_hash="demo123"
+            )
+            await db.users.insert_one(default_user.dict())
+            user_id = default_user.id
+        else:
+            user_id = user["id"]
+        
         # Create client if not exists
         client_data = intake_result.client
         existing_client = await db.clients.find_one({"email": client_data["email"]})
@@ -709,7 +724,7 @@ async def create_manual_intake(intake_result: IntakeResult):
                 name=client_data["name"],
                 email=client_data["email"],
                 company=client_data.get("company"),
-                owner_id="user_1"
+                owner_id=user_id
             )
             await db.clients.insert_one(client.dict())
             client_id = client.id
@@ -734,7 +749,7 @@ async def create_manual_intake(intake_result: IntakeResult):
             kind=EventKind.INTAKE_COMPLETED,
             entity_type="project",
             entity_id=project.id,
-            payload={"client_id": client_id, "project": project.dict()}
+            payload={"client_id": client_id, "project": project.dict(), "user_id": user_id}
         )
         
         return {"message": "Project created successfully", "project_id": project.id, "client_id": client_id}
