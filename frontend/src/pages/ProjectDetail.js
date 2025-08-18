@@ -924,7 +924,7 @@ ${user.email}`);
                             <Edit3 className="w-4 h-4 mr-2" />
                             Edit Invoice
                           </Button>
-                          <Button variant="outline">
+                          <Button variant="outline" onClick={() => handleDownloadInvoice(invoice.id)}>
                             <Download className="w-4 h-4 mr-2" />
                             Download PDF
                           </Button>
