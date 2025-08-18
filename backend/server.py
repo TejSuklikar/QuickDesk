@@ -207,7 +207,7 @@ class IntakeAgent:
             }
             
             Be thorough but concise. If information is missing or unclear, set confidence scores lower."""
-        ).with_model("openai", "gpt-4o-mini")
+        ).with_model("anthropic", "claude-4-sonnet-20250514")
     
     async def process_inquiry(self, raw_text: str) -> Dict[str, Any]:
         try:
