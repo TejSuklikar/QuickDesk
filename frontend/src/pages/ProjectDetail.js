@@ -241,7 +241,7 @@ const ProjectDetail = ({ user }) => {
   };
 
   const handleSendInvoice = (invoice) => {
-    if (!invoice || !client) return;
+    if (!invoice || !client || !user) return;
     
     const subject = encodeURIComponent(`Invoice ${invoice.details?.invoice_number || invoice.id.substring(0, 8)} - Payment Required`);
     const body = encodeURIComponent(`Hi ${client.name},
@@ -258,8 +258,8 @@ Please process payment at your earliest convenience. If you have any questions a
 Thank you for your business!
 
 Best regards,
-${contract?.variables?.freelancer_name || 'Freelancer'}
-${contract?.variables?.freelancer_email || 'freelancer@example.com'}`);
+${user.name}
+${user.email}`);
     
     const mailtoLink = `mailto:${client.email}?subject=${subject}&body=${body}`;
     window.open(mailtoLink);
