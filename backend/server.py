@@ -940,6 +940,9 @@ async def download_contract_pdf(contract_id: str):
             headers={"Content-Disposition": f"attachment; filename=contract_{contract_id[:8]}.pdf"}
         )
         
+    except HTTPException:
+        # Re-raise HTTPExceptions (like 404) without modification
+        raise
     except Exception as e:
         logger.error(f"PDF generation error: {e}")
         raise HTTPException(status_code=500, detail="PDF generation failed")
