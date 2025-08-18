@@ -10,6 +10,17 @@ from pathlib import Path
 ROOT_DIR = Path(__file__).parent / 'backend'
 load_dotenv(ROOT_DIR / '.env')
 
+def clean_claude_response(response: str) -> str:
+    """Remove markdown code blocks from Claude responses"""
+    response = response.strip()
+    if response.startswith('```json'):
+        response = response[7:]  # Remove ```json
+    elif response.startswith('```'):
+        response = response[3:]   # Remove ```
+    if response.endswith('```'):
+        response = response[:-3]  # Remove trailing ```
+    return response.strip()
+
 async def test_claude_direct():
     """Test Claude API directly"""
     try:
@@ -32,14 +43,16 @@ async def test_claude_direct():
         response = await llm.send_message(user_message)
         print(f"📥 Raw response: {response}")
         
-        # Try to parse as JSON
+        # Clean and try to parse as JSON
         try:
-            parsed = json.loads(response)
+            cleaned_response = clean_claude_response(response)
+            print(f"🧹 Cleaned response: {cleaned_response}")
+            parsed = json.loads(cleaned_response)
             print(f"✅ JSON parsing successful: {parsed}")
             return True
         except json.JSONDecodeError as e:
             print(f"❌ JSON parsing failed: {e}")
-            print(f"Response was: {repr(response)}")
+            print(f"Cleaned response was: {repr(cleaned_response)}")
             return False
             
     except Exception as e:
@@ -90,14 +103,16 @@ async def test_intake_agent():
         response = await llm.send_message(user_message)
         print(f"📥 Raw response: {response}")
         
-        # Try to parse as JSON
+        # Clean and try to parse as JSON
         try:
-            parsed = json.loads(response)
+            cleaned_response = clean_claude_response(response)
+            print(f"🧹 Cleaned response: {cleaned_response}")
+            parsed = json.loads(cleaned_response)
             print(f"✅ Intake parsing successful: {json.dumps(parsed, indent=2)}")
             return True
         except json.JSONDecodeError as e:
             print(f"❌ Intake JSON parsing failed: {e}")
-            print(f"Response was: {repr(response)}")
+            print(f"Cleaned response was: {repr(cleaned_response)}")
             return False
             
     except Exception as e:
