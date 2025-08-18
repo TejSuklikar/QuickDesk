@@ -181,6 +181,31 @@ const ProjectDetail = () => {
     </div>
   );
 
+  const handleSendInvoice = (invoice) => {
+    if (!invoice || !client) return;
+    
+    const subject = encodeURIComponent(`Invoice ${invoice.details?.invoice_number || invoice.id.substring(0, 8)} - Payment Required`);
+    const body = encodeURIComponent(`Hi ${client.name},
+
+Please find your invoice for "${project.title}".
+
+Invoice Details:
+- Invoice Number: ${invoice.details?.invoice_number || invoice.id.substring(0, 8)}
+- Amount Due: $${invoice.amount}
+- Due Date: ${format(new Date(invoice.due_date), 'MMMM d, yyyy')}
+
+Please process payment at your earliest convenience. If you have any questions about this invoice, please don't hesitate to reach out.
+
+Thank you for your business!
+
+Best regards,
+${user?.name || 'Freelancer'}
+${user?.email || 'freelancer@example.com'}`);
+    
+    const mailtoLink = `mailto:${client.email}?subject=${subject}&body=${body}`;
+    window.open(mailtoLink);
+  };
+
   const handleSendContract = () => {
     if (!contract || !client) return;
     
