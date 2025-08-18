@@ -830,7 +830,7 @@ ${contract.variables.freelancer_email}`);
                               </div>
                             </div>
                             
-                            <div className="grid grid-cols-3 gap-3">
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                               <div>
                                 <label className="text-xs text-slate-600">Tax Rate (%)</label>
                                 <Input
