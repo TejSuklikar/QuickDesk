@@ -695,17 +695,38 @@ ${contract.variables.freelancer_email}`);
                     )}
                     
                     <div className="mt-4 flex items-center space-x-3">
-                      <Button 
-                        onClick={() => handleSendInvoice(invoice)}
-                        className="bg-gradient-to-r from-green-500 to-emerald-600"
-                      >
-                        <Send className="w-4 h-4 mr-2" />
-                        Send to Client
-                      </Button>
-                      <Button variant="outline">
-                        <Download className="w-4 h-4 mr-2" />
-                        Download PDF
-                      </Button>
+                      {editingInvoice === invoice.id ? (
+                        <>
+                          <Button 
+                            onClick={() => handleSaveInvoice(invoice.id)}
+                            className="bg-gradient-to-r from-green-500 to-emerald-600"
+                          >
+                            <CheckCircle className="w-4 h-4 mr-2" />
+                            Save Changes
+                          </Button>
+                          <Button variant="outline" onClick={handleCancelEditInvoice}>
+                            Cancel
+                          </Button>
+                        </>
+                      ) : (
+                        <>
+                          <Button 
+                            onClick={() => handleSendInvoice(invoice)}
+                            className="bg-gradient-to-r from-green-500 to-emerald-600"
+                          >
+                            <Send className="w-4 h-4 mr-2" />
+                            Send to Client
+                          </Button>
+                          <Button variant="outline" onClick={() => handleEditInvoice(invoice)}>
+                            <Edit3 className="w-4 h-4 mr-2" />
+                            Edit Invoice
+                          </Button>
+                          <Button variant="outline">
+                            <Download className="w-4 h-4 mr-2" />
+                            Download PDF
+                          </Button>
+                        </>
+                      )}
                     </div>
                   </div>
                 ))}
