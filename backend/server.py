@@ -313,31 +313,75 @@ class BillingAgent:
         self.llm = LlmChat(
             api_key=os.environ['EMERGENT_LLM_KEY'],
             session_id="billing_agent",
-            system_message="""You are an AI billing agent. Create professional invoices and payment terms.
+            system_message="""You are an AI billing agent. Create professional invoices.
             
-            Return JSON for invoice details:
+            Return JSON for invoice details with this exact structure:
             {
-                "line_items": [{"description": "item", "amount": 0}],
-                "payment_terms": "payment terms",
+                "invoice_number": "INV-YYYY-XXXX",
+                "issue_date": "YYYY-MM-DD",
                 "due_date": "YYYY-MM-DD",
-                "notes": "professional notes"
-            }"""
+                "project_title": "project name",
+                "project_description": "brief project description", 
+                "line_items": [
+                    {"description": "item description", "amount": 0.00},
+                    {"description": "item description", "amount": 0.00},
+                    {"description": "item description", "amount": 0.00}
+                ],
+                "subtotal": 0.00,
+                "tax_rate": 0.00,
+                "tax_amount": 0.00,
+                "total_due": 0.00,
+                "payment_platform": "Stripe",
+                "payment_link": "https://pay.stripe.com/...",
+                "net_terms": "30",
+                "late_fee": "1.5"
+            }
+            
+            Generate realistic line items that add up to the project total."""
         ).with_model("openai", "gpt-4o-mini")
     
-    async def create_invoice_details(self, project_data: Dict[str, Any], amount: float) -> Dict[str, Any]:
+    async def create_invoice_details(self, project_data: Dict[str, Any], amount: float, user_data: Dict[str, Any] = None) -> Dict[str, Any]:
         try:
-            prompt = f"""Create invoice details for project: {project_data}, Amount: ${amount}"""
+            prompt = f"""Create invoice details for this project:
+            Project: {project_data.get('title', 'Untitled Project')}
+            Description: {project_data.get('description', 'Professional services')}
+            Total Amount: ${amount}
+            
+            Break down the total amount into 2-3 realistic line items that add up to ${amount}.
+            Generate a professional invoice number and set due date 30 days from now.
+            """
             user_message = UserMessage(text=prompt)
             response = await self.llm.send_message(user_message)
             
-            return json.loads(response)
+            result = json.loads(response)
+            # Ensure amounts are correct
+            result["total_due"] = amount
+            result["subtotal"] = amount
+            return result
+            
         except Exception as e:
             logger.error(f"Billing agent error: {e}")
+            # Enhanced fallback
+            invoice_number = f"INV-{datetime.utcnow().strftime('%Y')}-{datetime.utcnow().strftime('%m%d')}"
             return {
-                "line_items": [{"description": project_data.get("description", "Project work"), "amount": amount}],
-                "payment_terms": "Net 30",
+                "invoice_number": invoice_number,
+                "issue_date": datetime.utcnow().strftime("%Y-%m-%d"),
                 "due_date": (datetime.utcnow() + timedelta(days=30)).strftime("%Y-%m-%d"),
-                "notes": "Thank you for your business!"
+                "project_title": project_data.get("title", "Professional Services"),
+                "project_description": project_data.get("description", "Professional services rendered"),
+                "line_items": [
+                    {"description": "Project development and implementation", "amount": amount * 0.6},
+                    {"description": "Testing and quality assurance", "amount": amount * 0.3},
+                    {"description": "Final delivery and support", "amount": amount * 0.1}
+                ],
+                "subtotal": amount,
+                "tax_rate": 0.00,
+                "tax_amount": 0.00,
+                "total_due": amount,
+                "payment_platform": "Stripe",
+                "payment_link": "https://pay.stripe.com/invoice_link",
+                "net_terms": "30",
+                "late_fee": "1.5"
             }
 
 # Initialize agents
