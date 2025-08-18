@@ -646,20 +646,13 @@ async def get_clients():
 
 @api_router.post("/clients", response_model=Client)
 async def create_client(client_data: ClientCreate):
-    # For MVP, use the first available user or create a default one
+    # Note: In production, owner_id should come from JWT token or session
+    # For now, we'll use the first user or require proper authentication
     user = await db.users.find_one({})
     if not user:
-        # Create a default user for testing
-        default_user = User(
-            name="Demo Freelancer",
-            email="demo@freelancer.com", 
-            password_hash="demo123"
-        )
-        await db.users.insert_one(default_user.dict())
-        owner_id = default_user.id
-    else:
-        owner_id = user["id"]
+        raise HTTPException(status_code=400, detail="No user found. Please register first.")
     
+    owner_id = user["id"]
     client = Client(**client_data.dict(), owner_id=owner_id)
     await db.clients.insert_one(client.dict())
     return client
