@@ -22,7 +22,7 @@ const Layout = ({ children, user, onLogout }) => {
 
   const mainNavigation = [
     { name: 'Dashboard', href: '/dashboard', icon: Home, description: 'Overview & activity' },
-    { name: 'Inbox', href: '/inbox', icon: Mail, description: 'Process client emails', highlight: true },
+    { name: 'Inbox', href: '/inbox', icon: Mail, description: 'Process client emails' },
     { name: 'Projects', href: '/projects', icon: FolderOpen, description: 'Manage your work' },
     { name: 'Clients', href: '/clients', icon: Users, description: 'Client contacts' },
   ];
