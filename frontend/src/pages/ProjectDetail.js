@@ -315,16 +315,16 @@ ${contract.variables.freelancer_email}`);
   return (
     <div className="space-y-6 fade-in">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
+      <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
+        <div className="flex flex-col space-y-2 sm:flex-row sm:items-center sm:space-x-4 sm:space-y-0">
           <Link to="/projects">
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" className="w-full sm:w-auto">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Projects
             </Button>
           </Link>
-          <div>
-            <h1 className="text-2xl font-bold text-slate-900">{project.title}</h1>
+          <div className="text-center sm:text-left">
+            <h1 className="text-xl sm:text-2xl font-bold text-slate-900">{project.title}</h1>
             <p className="text-slate-600">{client?.name} • {client?.company}</p>
           </div>
         </div>
