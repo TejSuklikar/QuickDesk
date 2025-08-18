@@ -15,7 +15,6 @@ import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Badge } from '../components/ui/badge';
 import axios from 'axios';
-import { format } from 'date-fns';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -181,7 +180,7 @@ const Clients = () => {
                     <div className="flex items-center justify-between">
                       <span className="text-sm font-medium text-slate-700">Recent Projects</span>
                       <span className="text-xs text-slate-500">
-                        Added {format(new Date(client.created_at), 'MMM d, yyyy')}
+                        {new Date(client.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
                       </span>
                     </div>
                     
