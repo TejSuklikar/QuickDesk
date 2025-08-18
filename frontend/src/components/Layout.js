@@ -79,10 +79,6 @@ const Layout = ({ children, user, onLogout }) => {
               {active && (
                 <ChevronRight className="w-4 h-4 text-blue-600" />
               )}
-              
-              {item.highlight && !active && (
-                <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-              )}
             </Link>
           );
         })}
