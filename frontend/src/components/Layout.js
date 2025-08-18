@@ -200,14 +200,7 @@ const Layout = ({ children, user, onLogout }) => {
             </div>
 
             <div className="flex items-center space-x-4">
-              {/* Quick Action Button */}
-              <Link 
-                to="/inbox"
-                className="hidden sm:flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 transition-colors"
-              >
-                <Mail className="w-4 h-4" />
-                <span className="text-sm font-medium">Process Email</span>
-              </Link>
+              {/* Status indicator only */}
             </div>
           </div>
         </header>
