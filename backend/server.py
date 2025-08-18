@@ -859,7 +859,7 @@ async def generate_contract(contract_data: ContractCreate):
 
 @api_router.post("/contracts/send")
 async def send_contract(contract_id: str):
-    """Send contract for signature (mock implementation)"""
+    """Send contract for signature"""
     contract = await db.contracts.find_one({"id": contract_id})
     if not contract:
         raise HTTPException(status_code=404, detail="Contract not found")
