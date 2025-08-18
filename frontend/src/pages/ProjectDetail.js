@@ -15,7 +15,8 @@ import {
   Zap,
   Send,
   Download,
-  RefreshCw
+  RefreshCw,
+  Edit3
 } from 'lucide-react';
 import { Card } from '../components/ui/card';
 import { Button } from '../components/ui/button';
