@@ -141,7 +141,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Claude Sonnet 4 Integration"
+    - "Responsive Design Audit"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
