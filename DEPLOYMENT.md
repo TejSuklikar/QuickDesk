@@ -5,7 +5,7 @@
 ### Prerequisites
 1. **Vercel Account**: Sign up at [vercel.com](https://vercel.com)
 2. **MongoDB Atlas**: Set up free cluster at [mongodb.com/atlas](https://mongodb.com/atlas)
-3. **Emergent LLM Key**: Get from your Emergent profile
+3. **Claude API Key**: Get from [console.anthropic.com](https://console.anthropic.com)
 
 ### Environment Variables
 Set these in Vercel dashboard under Project Settings > Environment Variables:
@@ -16,7 +16,7 @@ MONGO_URL=mongodb+srv://username:password@cluster.mongodb.net/
 DB_NAME=freeflow_production
 
 # AI Integration  
-EMERGENT_LLM_KEY=sk-emergent-your-key-here
+CLAUDE_API_KEY=sk-ant-api03-your-claude-key-here
 
 # CORS (Optional)
 CORS_ORIGINS=https://your-domain.vercel.app
@@ -61,6 +61,13 @@ CORS_ORIGINS=https://your-domain.vercel.app
    - Copy connection string
    - Replace `<password>` with your password
 
+### Claude API Setup
+
+1. **Get API Key**
+   - Sign up at [console.anthropic.com](https://console.anthropic.com)
+   - Create new API key
+   - Copy the key (starts with `sk-ant-api03-`)
+
 ### Post-Deployment
 
 1. **Test API Endpoints**
@@ -70,7 +77,7 @@ CORS_ORIGINS=https://your-domain.vercel.app
 2. **Create First Account**
    - Visit your deployed app
    - Register new account
-   - Test email processing workflow
+   - Test email processing workflow with Claude AI
 
 ### Troubleshooting
 
@@ -78,7 +85,7 @@ CORS_ORIGINS=https://your-domain.vercel.app
 - **Build Fails**: Check node version (requires 18+)
 - **API Not Working**: Verify environment variables
 - **Database Connection**: Check MongoDB Atlas whitelist and credentials
-- **LLM Errors**: Verify Emergent LLM key
+- **Claude API Errors**: Verify Claude API key and usage limits
 
 **Logs:**
 ```bash
