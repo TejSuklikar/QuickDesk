@@ -266,7 +266,7 @@ ${contract?.variables?.freelancer_email || 'freelancer@example.com'}`);
   };
 
   const handleSendContract = () => {
-    if (!contract || !client) return;
+    if (!contract || !client || !user) return;
     
     const subject = encodeURIComponent(`Contract for ${project.title} - Ready for Signature`);
     const body = encodeURIComponent(`Hi ${client.name},
@@ -283,9 +283,8 @@ Please review the contract and let me know if you have any questions. Once you'r
 Looking forward to working with you!
 
 Best regards,
-${contract.variables.freelancer_name}
-${contract.variables.freelancer_business}
-${contract.variables.freelancer_email}`);
+${user.name}
+${user.email}`);
     
     const mailtoLink = `mailto:${client.email}?subject=${subject}&body=${body}`;
     window.open(mailtoLink);
