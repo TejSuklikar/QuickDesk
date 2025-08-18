@@ -873,6 +873,152 @@ async def send_contract(contract_id: str):
     
     return {"message": "Contract sent for signature", "contract_id": contract_id}
 
+@api_router.get("/contracts/{contract_id}/pdf")
+async def download_contract_pdf(contract_id: str):
+    """Generate and download contract as PDF"""
+    try:
+        contract = await db.contracts.find_one({"id": contract_id})
+        if not contract:
+            raise HTTPException(status_code=404, detail="Contract not found")
+        
+        # Get client and project info
+        client = await db.clients.find_one({"id": contract["client_id"]})
+        project = await db.projects.find_one({"id": contract["project_id"]})
+        
+        # Create PDF in memory
+        buffer = io.BytesIO()
+        doc = SimpleDocTemplate(buffer, pagesize=letter)
+        styles = getSampleStyleSheet()
+        
+        # Title style
+        title_style = ParagraphStyle(
+            'CustomTitle',
+            parent=styles['Heading1'],
+            fontSize=24,
+            spaceAfter=30,
+            textColor=colors.darkblue
+        )
+        
+        # Create content
+        content = []
+        content.append(Paragraph("SERVICE CONTRACT", title_style))
+        content.append(Spacer(1, 0.2*inch))
+        
+        # Contract details
+        vars = contract.get("variables", {})
+        contract_text = f"""
+        <b>Project:</b> {project.get('title', 'N/A')}<br/>
+        <b>Client:</b> {client.get('name', 'N/A')} - {client.get('company', 'N/A')}<br/>
+        <b>Freelancer:</b> {vars.get('freelancer_name', 'N/A')}<br/>
+        <b>Total Amount:</b> ${vars.get('project_budget', 'N/A')}<br/>
+        <b>Timeline:</b> {vars.get('start_date', 'N/A')} to {vars.get('end_date', 'N/A')}<br/>
+        <b>Payment Terms:</b> {vars.get('payment_terms', 'N/A')}<br/><br/>
+        
+        <b>Scope of Work:</b><br/>
+        {vars.get('scope_description', 'N/A')}<br/><br/>
+        
+        <b>Terms and Conditions:</b><br/>
+        {vars.get('terms_conditions', 'Standard terms and conditions apply.')}<br/><br/>
+        
+        <b>Signatures:</b><br/>
+        Client: _________________________ Date: _________<br/>
+        Freelancer: _________________________ Date: _________
+        """
+        
+        content.append(Paragraph(contract_text, styles['Normal']))
+        
+        # Build PDF
+        doc.build(content)
+        buffer.seek(0)
+        
+        return Response(
+            content=buffer.getvalue(),
+            media_type="application/pdf",
+            headers={"Content-Disposition": f"attachment; filename=contract_{contract_id[:8]}.pdf"}
+        )
+        
+    except Exception as e:
+        logger.error(f"PDF generation error: {e}")
+        raise HTTPException(status_code=500, detail="PDF generation failed")
+
+@api_router.get("/invoices/{invoice_id}/pdf")
+async def download_invoice_pdf(invoice_id: str):
+    """Generate and download invoice as PDF"""
+    try:
+        invoice = await db.invoices.find_one({"id": invoice_id})
+        if not invoice:
+            raise HTTPException(status_code=404, detail="Invoice not found")
+        
+        # Get client and project info
+        client = await db.clients.find_one({"id": invoice["client_id"]})
+        project = await db.projects.find_one({"id": invoice["project_id"]})
+        
+        # Create PDF in memory
+        buffer = io.BytesIO()
+        doc = SimpleDocTemplate(buffer, pagesize=letter)
+        styles = getSampleStyleSheet()
+        
+        # Title style
+        title_style = ParagraphStyle(
+            'CustomTitle',
+            parent=styles['Heading1'],
+            fontSize=24,
+            spaceAfter=30,
+            textColor=colors.darkblue
+        )
+        
+        # Create content
+        content = []
+        content.append(Paragraph("INVOICE", title_style))
+        content.append(Spacer(1, 0.2*inch))
+        
+        # Invoice details
+        details = invoice.get("details", {})
+        invoice_text = f"""
+        <b>Invoice Number:</b> {details.get('invoice_number', invoice['id'][:8])}<br/>
+        <b>Project:</b> {project.get('title', 'N/A')}<br/>
+        <b>Client:</b> {client.get('name', 'N/A')} - {client.get('company', 'N/A')}<br/>
+        <b>Issue Date:</b> {details.get('issue_date', 'N/A')}<br/>
+        <b>Due Date:</b> {details.get('due_date', 'N/A')}<br/><br/>
+        
+        <b>Line Items:</b><br/>
+        """
+        
+        # Add line items
+        line_items = details.get("line_items", [])
+        total = 0
+        for item in line_items:
+            amount = float(item.get("amount", 0))
+            total += amount
+            invoice_text += f"• {item.get('description', 'N/A')}: ${amount:.2f}<br/>"
+        
+        invoice_text += f"""<br/>
+        <b>Subtotal:</b> ${total:.2f}<br/>
+        <b>Tax:</b> ${details.get('tax_amount', 0)}<br/>
+        <b>Total Amount Due:</b> ${invoice.get('amount', total)}<br/><br/>
+        
+        <b>Payment Instructions:</b><br/>
+        {details.get('payment_instructions', 'Please process payment according to agreed terms.')}<br/><br/>
+        
+        Thank you for your business!
+        """
+        
+        content.append(Paragraph(invoice_text, styles['Normal']))
+        
+        # Build PDF
+        doc.build(content)
+        buffer.seek(0)
+        
+        return Response(
+            content=buffer.getvalue(),
+            media_type="application/pdf",
+            headers={"Content-Disposition": f"attachment; filename=invoice_{invoice_id[:8]}.pdf"}
+        )
+        
+    except Exception as e:
+        logger.error(f"Invoice PDF generation error: {e}")
+        raise HTTPException(status_code=500, detail="Invoice PDF generation failed")
+
 @api_router.get("/contracts/status/{contract_id}")
 async def get_contract_status(contract_id: str):
     contract = await db.contracts.find_one({"id": contract_id})
