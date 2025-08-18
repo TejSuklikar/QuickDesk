@@ -316,6 +316,158 @@ class FreeFlowAPITester:
         """Test agent activity log"""
         return self.run_test("Agent Activity", "GET", "dashboard/agent-activity", 200)
 
+    def test_contract_pdf_download(self):
+        """Test contract PDF generation and download"""
+        if not self.contract_id:
+            print("⚠️  Skipping contract PDF test - no contract available")
+            return False
+            
+        print("📄 Testing Contract PDF Generation...")
+        url = f"{self.base_url}/contracts/{self.contract_id}/pdf"
+        
+        try:
+            response = requests.get(url, timeout=15)
+            
+            if response.status_code == 200:
+                # Check if response is PDF
+                content_type = response.headers.get('content-type', '')
+                content_disposition = response.headers.get('content-disposition', '')
+                
+                if 'application/pdf' in content_type:
+                    print(f"✅ Contract PDF Generated Successfully")
+                    print(f"   Content-Type: {content_type}")
+                    print(f"   Content-Disposition: {content_disposition}")
+                    print(f"   PDF Size: {len(response.content)} bytes")
+                    
+                    # Verify PDF content starts with PDF header
+                    if response.content.startswith(b'%PDF'):
+                        print("✅ Valid PDF format confirmed")
+                        self.tests_passed += 1
+                    else:
+                        print("❌ Invalid PDF format - missing PDF header")
+                        
+                    self.tests_run += 1
+                    return True
+                else:
+                    print(f"❌ Expected PDF content-type, got: {content_type}")
+                    self.tests_run += 1
+                    return False
+            else:
+                print(f"❌ Failed - Status: {response.status_code}")
+                try:
+                    error_data = response.json()
+                    print(f"   Error: {error_data}")
+                except:
+                    print(f"   Error: {response.text}")
+                self.tests_run += 1
+                return False
+                
+        except Exception as e:
+            print(f"❌ Failed - Error: {str(e)}")
+            self.tests_run += 1
+            return False
+
+    def test_invoice_pdf_download(self):
+        """Test invoice PDF generation and download"""
+        if not self.invoice_id:
+            print("⚠️  Skipping invoice PDF test - no invoice available")
+            return False
+            
+        print("📄 Testing Invoice PDF Generation...")
+        url = f"{self.base_url}/invoices/{self.invoice_id}/pdf"
+        
+        try:
+            response = requests.get(url, timeout=15)
+            
+            if response.status_code == 200:
+                # Check if response is PDF
+                content_type = response.headers.get('content-type', '')
+                content_disposition = response.headers.get('content-disposition', '')
+                
+                if 'application/pdf' in content_type:
+                    print(f"✅ Invoice PDF Generated Successfully")
+                    print(f"   Content-Type: {content_type}")
+                    print(f"   Content-Disposition: {content_disposition}")
+                    print(f"   PDF Size: {len(response.content)} bytes")
+                    
+                    # Verify PDF content starts with PDF header
+                    if response.content.startswith(b'%PDF'):
+                        print("✅ Valid PDF format confirmed")
+                        self.tests_passed += 1
+                    else:
+                        print("❌ Invalid PDF format - missing PDF header")
+                        
+                    self.tests_run += 1
+                    return True
+                else:
+                    print(f"❌ Expected PDF content-type, got: {content_type}")
+                    self.tests_run += 1
+                    return False
+            else:
+                print(f"❌ Failed - Status: {response.status_code}")
+                try:
+                    error_data = response.json()
+                    print(f"   Error: {error_data}")
+                except:
+                    print(f"   Error: {response.text}")
+                self.tests_run += 1
+                return False
+                
+        except Exception as e:
+            print(f"❌ Failed - Error: {str(e)}")
+            self.tests_run += 1
+            return False
+
+    def test_nonexistent_contract_pdf(self):
+        """Test PDF generation for non-existent contract"""
+        fake_contract_id = "nonexistent-contract-id"
+        print(f"🔍 Testing PDF generation for non-existent contract...")
+        
+        url = f"{self.base_url}/contracts/{fake_contract_id}/pdf"
+        
+        try:
+            response = requests.get(url, timeout=10)
+            
+            if response.status_code == 404:
+                print("✅ Correctly returned 404 for non-existent contract")
+                self.tests_passed += 1
+                self.tests_run += 1
+                return True
+            else:
+                print(f"❌ Expected 404, got {response.status_code}")
+                self.tests_run += 1
+                return False
+                
+        except Exception as e:
+            print(f"❌ Failed - Error: {str(e)}")
+            self.tests_run += 1
+            return False
+
+    def test_nonexistent_invoice_pdf(self):
+        """Test PDF generation for non-existent invoice"""
+        fake_invoice_id = "nonexistent-invoice-id"
+        print(f"🔍 Testing PDF generation for non-existent invoice...")
+        
+        url = f"{self.base_url}/invoices/{fake_invoice_id}/pdf"
+        
+        try:
+            response = requests.get(url, timeout=10)
+            
+            if response.status_code == 404:
+                print("✅ Correctly returned 404 for non-existent invoice")
+                self.tests_passed += 1
+                self.tests_run += 1
+                return True
+            else:
+                print(f"❌ Expected 404, got {response.status_code}")
+                self.tests_run += 1
+                return False
+                
+        except Exception as e:
+            print(f"❌ Failed - Error: {str(e)}")
+            self.tests_run += 1
+            return False
+
 def main():
     print("🚀 Starting FreeFlow API Tests")
     print("=" * 50)
