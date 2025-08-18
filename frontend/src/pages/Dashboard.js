@@ -248,12 +248,7 @@ const Dashboard = () => {
                         {event.entity_type} • {event.entity_id.substring(0, 8)}...
                       </p>
                       <p className="text-xs text-slate-500">
-                        {new Date(event.created_at).toLocaleDateString('en-US', { 
-  month: 'short', 
-  day: 'numeric', 
-  hour: 'numeric', 
-  minute: '2-digit' 
-})}
+                        {new Date(event.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}
                       </p>
                     </div>
                   </div>
