@@ -826,23 +826,35 @@ async def create_invoice(invoice_data: InvoiceCreate):
     trace_id = str(uuid.uuid4())
     
     try:
-        # Get project data
+        # Get project and related data
         project = await db.projects.find_one({"id": invoice_data.project_id})
         if not project:
             raise HTTPException(status_code=404, detail="Project not found")
         
-        # Generate invoice details using AI
-        invoice_details = await billing_agent.create_invoice_details(project, invoice_data.amount)
+        client = await db.clients.find_one({"id": project["client_id"]})
+        if not client:
+            raise HTTPException(status_code=404, detail="Client not found")
+            
+        user = await db.users.find_one({"id": client["owner_id"]})
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
         
-        # Create invoice
-        due_date = datetime.strptime(invoice_details["due_date"], "%Y-%m-%d")
+        # Generate invoice details using AI
+        invoice_details = await billing_agent.create_invoice_details(project, invoice_data.amount, user)
+        
+        # Create invoice with enhanced structure
         invoice = Invoice(
             project_id=invoice_data.project_id,
             amount=invoice_data.amount,
-            due_date=due_date,
+            due_date=datetime.strptime(invoice_details["due_date"], "%Y-%m-%d"),
             status=InvoiceStatus.SENT
         )
-        await db.invoices.insert_one(invoice.dict())
+        
+        # Store the full invoice details in the invoice record
+        invoice_dict = invoice.dict()
+        invoice_dict["details"] = invoice_details
+        
+        await db.invoices.insert_one(invoice_dict)
         
         # Update project status
         await db.projects.update_one(
@@ -856,10 +868,13 @@ async def create_invoice(invoice_data: InvoiceCreate):
             kind=EventKind.INVOICE_SENT,
             entity_type="invoice",
             entity_id=invoice.id,
-            payload=invoice.dict()
+            payload={"invoice": invoice.dict(), "details": invoice_details}
         )
         
-        return invoice
+        # Return invoice with details
+        result = invoice.dict()
+        result["details"] = invoice_details
+        return result
         
     except Exception as e:
         logger.error(f"Invoice creation error: {e}")
