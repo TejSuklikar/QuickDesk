@@ -579,23 +579,114 @@ ${contract.variables.freelancer_email}`);
                 </div>
                 
                 <div className="mt-4">
+                  <label className="text-sm font-medium text-slate-700">Project Description</label>
+                  {editingContract ? (
+                    <textarea
+                      className="w-full mt-1 p-2 border border-slate-300 rounded-md"
+                      value={contractEdits.project_description || ''}
+                      onChange={(e) => handleContractFieldChange('project_description', e.target.value)}
+                      rows={3}
+                    />
+                  ) : (
+                    <p className="mt-1 text-slate-900">{contract.variables.project_description}</p>
+                  )}
+                </div>
+                
+                <div className="mt-4">
                   <label className="text-sm font-medium text-slate-700">Deliverables</label>
-                  <ul className="mt-1 text-slate-900">
-                    {contract.variables.deliverables_list?.map((deliverable, index) => (
-                      <li key={index} className="flex items-start space-x-2">
-                        <span className="text-slate-500">•</span>
-                        <span>{deliverable}</span>
-                      </li>
-                    ))}
-                  </ul>
+                  {editingContract ? (
+                    <div className="mt-1 space-y-2">
+                      {(contractEdits.deliverables_list || []).map((deliverable, index) => (
+                        <div key={index} className="flex items-center space-x-2">
+                          <span className="text-slate-500">•</span>
+                          <Input
+                            value={deliverable}
+                            onChange={(e) => {
+                              const newDeliverables = [...(contractEdits.deliverables_list || [])];
+                              newDeliverables[index] = e.target.value;
+                              handleContractFieldChange('deliverables_list', newDeliverables);
+                            }}
+                            className="flex-1"
+                          />
+                        </div>
+                      ))}
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => {
+                          const newDeliverables = [...(contractEdits.deliverables_list || []), ''];
+                          handleContractFieldChange('deliverables_list', newDeliverables);
+                        }}
+                      >
+                        Add Deliverable
+                      </Button>
+                    </div>
+                  ) : (
+                    <ul className="mt-1 text-slate-900">
+                      {contract.variables.deliverables_list?.map((deliverable, index) => (
+                        <li key={index} className="flex items-start space-x-2">
+                          <span className="text-slate-500">•</span>
+                          <span>{deliverable}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </div>
                 
                 <div className="mt-4">
                   <label className="text-sm font-medium text-slate-700">Milestones</label>
-                  <div className="mt-1 space-y-1 text-slate-900">
-                    <p>• {contract.variables.milestone_1}</p>
-                    <p>• {contract.variables.milestone_2}</p>
-                    <p>• {contract.variables.milestone_3}</p>
+                  {editingContract ? (
+                    <div className="mt-1 space-y-2">
+                      <Input
+                        value={contractEdits.milestone_1 || ''}
+                        onChange={(e) => handleContractFieldChange('milestone_1', e.target.value)}
+                        placeholder="Milestone 1"
+                      />
+                      <Input
+                        value={contractEdits.milestone_2 || ''}
+                        onChange={(e) => handleContractFieldChange('milestone_2', e.target.value)}
+                        placeholder="Milestone 2"
+                      />
+                      <Input
+                        value={contractEdits.milestone_3 || ''}
+                        onChange={(e) => handleContractFieldChange('milestone_3', e.target.value)}
+                        placeholder="Milestone 3"
+                      />
+                    </div>
+                  ) : (
+                    <div className="mt-1 space-y-1 text-slate-900">
+                      <p>• {contract.variables.milestone_1}</p>
+                      <p>• {contract.variables.milestone_2}</p>
+                      <p>• {contract.variables.milestone_3}</p>
+                    </div>
+                  )}
+                </div>
+                
+                <div className="mt-4 grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm font-medium text-slate-700">Jurisdiction</label>
+                    {editingContract ? (
+                      <Input
+                        value={contractEdits.jurisdiction || ''}
+                        onChange={(e) => handleContractFieldChange('jurisdiction', e.target.value)}
+                        placeholder="State of California"
+                      />
+                    ) : (
+                      <p className="text-slate-900">{contract.variables.jurisdiction}</p>
+                    )}
+                  </div>
+                  
+                  <div>
+                    <label className="text-sm font-medium text-slate-700">Late Fee (%)</label>
+                    {editingContract ? (
+                      <Input
+                        value={contractEdits.late_fee || ''}
+                        onChange={(e) => handleContractFieldChange('late_fee', e.target.value)}
+                        placeholder="1.5"
+                      />
+                    ) : (
+                      <p className="text-slate-900">{contract.variables.late_fee}%</p>
+                    )}
                   </div>
                 </div>
                 
