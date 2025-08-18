@@ -24,8 +24,8 @@
     }
   ],
   "env": {
-    "MONGO_URL": "@mongo-url",
-    "DB_NAME": "@db-name",
-    "CLAUDE_API_KEY": "@claude-api-key"
+    "MONGO_URL": "$mongo-url",
+    "DB_NAME": "$db-name",
+    "CLAUDE_API_KEY": "$claude-api-key"
   }
 }
