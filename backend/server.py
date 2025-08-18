@@ -226,8 +226,9 @@ class IntakeAgent:
             user_message = UserMessage(text=f"Extract project information from this inquiry: {raw_text}")
             response = await self.llm.send_message(user_message)
             
-            # Parse JSON response
-            result = json.loads(response)
+            # Clean and parse JSON response
+            cleaned_response = clean_claude_response(response)
+            result = json.loads(cleaned_response)
             return result
         except Exception as e:
             logger.error(f"Intake agent error: {e}")
