@@ -258,7 +258,7 @@ class ContractAgent:
             Generate realistic milestones, payment terms, and deadlines based on the project scope and timeline."""
         ).with_model("openai", "gpt-4o-mini")
     
-    async def generate_contract_variables(self, project_data: Dict[str, Any], client_data: Dict[str, Any]) -> Dict[str, Any]:
+    async def generate_contract_variables(self, project_data: Dict[str, Any], client_data: Dict[str, Any], user_data: Dict[str, Any]) -> Dict[str, Any]:
         try:
             prompt = f"""Generate contract variables for this freelance project:
             
@@ -267,6 +267,10 @@ class ContractAgent:
             - Email: {client_data.get('email', 'unknown@email.com')}
             - Company: {client_data.get('company', 'Individual')}
             
+            Freelancer Information:
+            - Name: {user_data.get('name', 'Freelancer')}
+            - Email: {user_data.get('email', 'freelancer@email.com')}
+            
             Project Information:
             - Title: {project_data.get('title', 'Untitled Project')}
             - Description: {project_data.get('description', 'No description provided')}
@@ -274,6 +278,7 @@ class ContractAgent:
             - Timeline: {project_data.get('timeline', 'Not specified')}
             
             Generate professional contract variables with realistic milestones and payment terms.
+            Use the actual freelancer name and create a business name if not provided.
             """
             user_message = UserMessage(text=prompt)
             response = await self.llm.send_message(user_message)
@@ -281,13 +286,16 @@ class ContractAgent:
             return json.loads(response)
         except Exception as e:
             logger.error(f"Contract agent error: {e}")
-            # Enhanced fallback with proper structure
+            # Enhanced fallback with actual user data
+            freelancer_business = f"{user_data.get('name', 'Freelancer').split()[0]} Digital Services"
+            
             return {
                 "client_name": client_data.get("name", "Client Name"),
                 "client_company": client_data.get("company", "Individual"),
                 "client_email": client_data.get("email", "client@example.com"),
-                "freelancer_name": "John Smith",
-                "freelancer_business": "Smith Digital Services",
+                "freelancer_name": user_data.get("name", "Freelancer"),
+                "freelancer_business": freelancer_business,
+                "freelancer_email": user_data.get("email", "freelancer@example.com"),
                 "project_description": project_data.get("description", "Professional services as described"),
                 "deliverables_list": [
                     "Project planning and requirements analysis",
