@@ -751,8 +751,13 @@ async def generate_contract(contract_data: ContractCreate):
         if not client:
             raise HTTPException(status_code=404, detail="Client not found")
         
-        # Generate contract variables using AI
-        variables = await contract_agent.generate_contract_variables(project, client)
+        # Get the user who owns this client (for freelancer info)
+        user = await db.users.find_one({"id": client["owner_id"]})
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        # Generate contract variables using AI with user info
+        variables = await contract_agent.generate_contract_variables(project, client, user)
         
         # Create contract record
         contract = Contract(
