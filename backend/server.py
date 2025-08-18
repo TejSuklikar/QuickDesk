@@ -881,9 +881,12 @@ async def download_contract_pdf(contract_id: str):
         if not contract:
             raise HTTPException(status_code=404, detail="Contract not found")
         
-        # Get client and project info
-        client = await db.clients.find_one({"id": contract["client_id"]})
+        # Get project and client info
         project = await db.projects.find_one({"id": contract["project_id"]})
+        if not project:
+            raise HTTPException(status_code=404, detail="Project not found")
+        
+        client = await db.clients.find_one({"id": project["client_id"]})
         
         # Create PDF in memory
         buffer = io.BytesIO()
