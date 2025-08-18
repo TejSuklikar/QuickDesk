@@ -598,17 +598,38 @@ ${contract.variables.freelancer_email}`);
                 </div>
                 
                 <div className="flex items-center space-x-3">
-                  <Button 
-                    onClick={handleSendContract}
-                    className="bg-gradient-to-r from-green-500 to-emerald-600"
-                  >
-                    <Send className="w-4 h-4 mr-2" />
-                    Send to Client
-                  </Button>
-                  <Button variant="outline">
-                    <Download className="w-4 h-4 mr-2" />
-                    Download PDF
-                  </Button>
+                  {editingContract ? (
+                    <>
+                      <Button 
+                        onClick={handleSaveContract}
+                        className="bg-gradient-to-r from-green-500 to-emerald-600"
+                      >
+                        <CheckCircle className="w-4 h-4 mr-2" />
+                        Save Changes
+                      </Button>
+                      <Button variant="outline" onClick={handleCancelEditContract}>
+                        Cancel
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <Button 
+                        onClick={handleSendContract}
+                        className="bg-gradient-to-r from-green-500 to-emerald-600"
+                      >
+                        <Send className="w-4 h-4 mr-2" />
+                        Send to Client
+                      </Button>
+                      <Button variant="outline" onClick={handleEditContract}>
+                        <Edit3 className="w-4 h-4 mr-2" />
+                        Edit Contract
+                      </Button>
+                      <Button variant="outline">
+                        <Download className="w-4 h-4 mr-2" />
+                        Download PDF
+                      </Button>
+                    </>
+                  )}
                 </div>
               </div>
             ) : (
