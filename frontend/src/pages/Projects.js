@@ -313,10 +313,12 @@ const Projects = () => {
             }
           </p>
           {(!searchTerm && statusFilter === 'all') && (
-            <Button className="bg-gradient-to-r from-blue-500 to-purple-600">
-              <Plus className="w-4 h-4 mr-2" />
-              Create Project
-            </Button>
+            <Link to="/inbox">
+              <Button className="bg-gradient-to-r from-blue-500 to-purple-600">
+                <Plus className="w-4 h-4 mr-2" />
+                Create Project
+              </Button>
+            </Link>
           )}
         </Card>
       )}
