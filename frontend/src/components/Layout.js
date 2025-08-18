@@ -149,10 +149,10 @@ const Layout = ({ children, user, onLogout }) => {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-slate-900 truncate">
-                  {user?.name || 'Demo User'}
+                  {user?.name || 'User'}
                 </p>
                 <p className="text-xs text-slate-500 truncate">
-                  {user?.email || 'demo@freeflow.ai'}
+                  {user?.email || 'user@freeflow.ai'}
                 </p>
               </div>
             </div>
