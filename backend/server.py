@@ -754,20 +754,12 @@ async def create_manual_intake(intake_result: IntakeResult):
     trace_id = str(uuid.uuid4())
     
     try:
-        # For MVP, we'll use the first user or create a default user
         # In production, this would use the authenticated user ID
         user = await db.users.find_one({})
         if not user:
-            # Create a default user for testing
-            default_user = User(
-                name="Demo Freelancer",
-                email="demo@freelancer.com", 
-                password_hash="demo123"
-            )
-            await db.users.insert_one(default_user.dict())
-            user_id = default_user.id
-        else:
-            user_id = user["id"]
+            raise HTTPException(status_code=400, detail="No user found. Please register first.")
+        
+        user_id = user["id"]
         
         # Create client if not exists
         client_data = intake_result.client
