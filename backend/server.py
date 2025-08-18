@@ -1050,6 +1050,32 @@ async def signature_webhook():
 async def root():
     return {"message": "FreeFlow API is running", "status": "healthy"}
 
+# Development endpoints
+@api_router.delete("/dev/cleanup")
+async def cleanup_demo_data():
+    """Clean up any demo/test data"""
+    try:
+        # Remove demo users
+        await db.users.delete_many({"email": {"$regex": "demo|test"}})
+        
+        # Remove projects/clients/contracts/invoices associated with demo users
+        demo_clients = await db.clients.find({"owner_id": {"$regex": "demo"}}).to_list(length=None)
+        demo_client_ids = [client["id"] for client in demo_clients]
+        
+        if demo_client_ids:
+            await db.projects.delete_many({"client_id": {"$in": demo_client_ids}})
+            await db.contracts.delete_many({"client_id": {"$in": demo_client_ids}})
+            await db.invoices.delete_many({"client_id": {"$in": demo_client_ids}})
+            await db.clients.delete_many({"id": {"$in": demo_client_ids}})
+        
+        # Clean up any orphaned data
+        await db.agent_events.delete_many({"entity_id": {"$regex": "demo"}})
+        
+        return {"message": "Demo data cleaned up successfully"}
+    except Exception as e:
+        logger.error(f"Cleanup error: {e}")
+        return {"message": "Cleanup completed with some errors", "error": str(e)}
+
 # Include the router in the main app
 app.include_router(api_router)
 
