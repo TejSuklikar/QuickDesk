@@ -173,30 +173,30 @@ const Projects = () => {
           const client = getClientById(project.client_id);
           
           return (
-            <Card key={project.id} className="p-6 hover-lift transition-all duration-200 group">
+            <Card key={project.id} className="p-6 hover-lift transition-all duration-200 group relative overflow-hidden">
               <div className="flex items-start justify-between mb-4">
-                <Link to={`/projects/${project.id}`} className="flex items-center space-x-3 flex-1">
-                  <div className="p-2 bg-slate-100 rounded-lg group-hover:bg-blue-100 transition-colors">
+                <Link to={`/projects/${project.id}`} className="flex items-center space-x-3 flex-1 min-w-0">
+                  <div className="p-2 bg-slate-100 rounded-lg group-hover:bg-blue-100 transition-colors flex-shrink-0">
                     <FolderOpen className="w-5 h-5 text-slate-600 group-hover:text-blue-600" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <h3 className="font-semibold text-slate-900 truncate group-hover:text-blue-600 transition-colors">
                       {project.title}
                     </h3>
-                    <p className="text-sm text-slate-600">
+                    <p className="text-sm text-slate-600 truncate">
                       {client?.name || 'Unknown Client'}
                     </p>
                   </div>
                 </Link>
                 
-                <div className="flex items-center space-x-2">
+                <div className="flex items-start space-x-2 flex-shrink-0 ml-2">
                   <div className="flex flex-col items-end space-y-1">
-                    <Badge className={`${getStatusColor(project.status)} flex items-center space-x-1`}>
+                    <Badge className={`${getStatusColor(project.status)} flex items-center space-x-1 whitespace-nowrap`}>
                       {getStatusIcon(project.status)}
                       <span>{project.status}</span>
                     </Badge>
                     {project.status === 'Intake' && (
-                      <span className="text-xs text-amber-600 font-medium">Ready for Contract</span>
+                      <span className="text-xs text-amber-600 font-medium whitespace-nowrap">Ready for Contract</span>
                     )}
                     {project.status === 'Contract' && (
                       <span className="text-xs text-blue-600 font-medium">Ready for Billing</span>
