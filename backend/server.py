@@ -296,7 +296,9 @@ class ContractAgent:
             user_message = UserMessage(text=prompt)
             response = await self.llm.send_message(user_message)
             
-            return json.loads(response)
+            # Clean and parse JSON response
+            cleaned_response = clean_claude_response(response)
+            return json.loads(cleaned_response)
         except Exception as e:
             logger.error(f"Contract agent error: {e}")
             # Enhanced fallback with actual user data
