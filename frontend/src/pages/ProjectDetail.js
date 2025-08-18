@@ -181,6 +181,32 @@ const ProjectDetail = () => {
     </div>
   );
 
+  const handleSendContract = () => {
+    if (!contract || !client) return;
+    
+    const subject = encodeURIComponent(`Contract for ${project.title} - Ready for Signature`);
+    const body = encodeURIComponent(`Hi ${client.name},
+
+Please find attached the service contract for "${project.title}".
+
+Contract Details:
+- Total Amount: $${contract.variables.project_budget}
+- Timeline: ${contract.variables.start_date} to ${contract.variables.end_date}
+- Payment Terms: ${contract.variables.payment_terms}
+
+Please review the contract and let me know if you have any questions. Once you're ready, please sign and return the contract so we can get started on your project.
+
+Looking forward to working with you!
+
+Best regards,
+${contract.variables.freelancer_name}
+${contract.variables.freelancer_business}
+${contract.variables.freelancer_email}`);
+    
+    const mailtoLink = `mailto:${client.email}?subject=${subject}&body=${body}`;
+    window.open(mailtoLink);
+  };
+
   if (loading) {
     return (
       <div className="space-y-6 animate-pulse">
