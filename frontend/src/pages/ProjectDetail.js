@@ -728,7 +728,7 @@ ${user.email}`);
                         <Edit3 className="w-4 h-4 mr-2" />
                         Edit Contract
                       </Button>
-                      <Button variant="outline">
+                      <Button variant="outline" onClick={handleDownloadContract}>
                         <Download className="w-4 h-4 mr-2" />
                         Download PDF
                       </Button>
