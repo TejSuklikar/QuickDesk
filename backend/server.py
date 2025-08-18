@@ -646,7 +646,21 @@ async def get_clients():
 
 @api_router.post("/clients", response_model=Client)
 async def create_client(client_data: ClientCreate):
-    client = Client(**client_data.dict(), owner_id="user_1")  # Hardcoded for MVP
+    # For MVP, use the first available user or create a default one
+    user = await db.users.find_one({})
+    if not user:
+        # Create a default user for testing
+        default_user = User(
+            name="Demo Freelancer",
+            email="demo@freelancer.com", 
+            password_hash="demo123"
+        )
+        await db.users.insert_one(default_user.dict())
+        owner_id = default_user.id
+    else:
+        owner_id = user["id"]
+    
+    client = Client(**client_data.dict(), owner_id=owner_id)
     await db.clients.insert_one(client.dict())
     return client
 
