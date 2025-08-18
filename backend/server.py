@@ -669,6 +669,36 @@ async def get_project(project_id: str):
         raise HTTPException(status_code=404, detail="Project not found")
     return Project(**project)
 
+@api_router.delete("/projects/{project_id}")
+async def delete_project(project_id: str):
+    """Delete a project and all related data"""
+    try:
+        # Check if project exists
+        project = await db.projects.find_one({"id": project_id})
+        if not project:
+            raise HTTPException(status_code=404, detail="Project not found")
+        
+        # Delete related contracts
+        await db.contracts.delete_many({"project_id": project_id})
+        
+        # Delete related invoices
+        await db.invoices.delete_many({"project_id": project_id})
+        
+        # Delete related agent events
+        await db.agent_events.delete_many({"entity_id": project_id})
+        
+        # Delete the project
+        result = await db.projects.delete_one({"id": project_id})
+        
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="Project not found")
+        
+        return {"message": "Project deleted successfully", "project_id": project_id}
+        
+    except Exception as e:
+        logger.error(f"Project deletion error: {e}")
+        raise HTTPException(status_code=500, detail="Failed to delete project")
+
 # Intake endpoints
 @api_router.post("/intake/parse-email")
 async def parse_email_inquiry(intake_data: IntakeInput):
