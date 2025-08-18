@@ -44,11 +44,16 @@ function App() {
   const login = (userData) => {
     setUser(userData);
     localStorage.setItem('freeflow_user', JSON.stringify(userData));
+    localStorage.setItem('freeflow_session', JSON.stringify({
+      timestamp: Date.now(),
+      userId: userData.id
+    }));
   };
 
   const logout = () => {
     setUser(null);
     localStorage.removeItem('freeflow_user');
+    localStorage.removeItem('freeflow_session');
   };
 
   if (loading) {
