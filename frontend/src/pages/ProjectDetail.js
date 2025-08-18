@@ -690,7 +690,7 @@ ${contract.variables.freelancer_email}`);
                   </div>
                 </div>
                 
-                <div className="flex items-center space-x-3">
+                <div className="flex flex-col space-y-3 sm:flex-row sm:items-center sm:space-x-3 sm:space-y-0">
                   {editingContract ? (
                     <>
                       <Button 
