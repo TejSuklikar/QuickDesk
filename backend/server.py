@@ -951,7 +951,7 @@ async def get_invoice(invoice_id: str):
 
 @api_router.post("/invoices/remind/{invoice_id}")
 async def remind_invoice(invoice_id: str):
-    """Send invoice reminder (mock implementation)"""
+    """Send invoice reminder"""
     invoice = await db.invoices.find_one({"id": invoice_id})
     if not invoice:
         raise HTTPException(status_code=404, detail="Invoice not found")
