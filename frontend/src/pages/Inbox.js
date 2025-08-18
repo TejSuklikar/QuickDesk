@@ -145,8 +145,8 @@ Acme Corporation`;
 
       {/* Workflow Steps Indicator */}
       <Card className="p-4 bg-gradient-to-r from-slate-50 to-blue-50">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-8">
+        <div className="flex flex-col sm:flex-row gap-4 overflow-x-auto">
+          <div className="flex items-center space-x-4 min-w-max">
             {/* Step 1 */}
             <div className="flex items-center space-x-2">
               <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
@@ -154,7 +154,7 @@ Acme Corporation`;
               }`}>
                 <Mail className="w-4 h-4" />
               </div>
-              <div>
+              <div className="hidden sm:block">
                 <div className="text-sm font-medium text-slate-900">1. AI Extract</div>
                 <div className="text-xs text-slate-500">
                   {extractedData ? 'Complete' : rawMessage ? 'Ready' : 'Waiting'}
@@ -171,7 +171,7 @@ Acme Corporation`;
               }`}>
                 <CheckCircle className="w-4 h-4" />
               </div>
-              <div>
+              <div className="hidden sm:block">
                 <div className="text-sm font-medium text-slate-900">2. Create Project</div>
                 <div className="text-xs text-slate-500">
                   {projectCreated ? 'Complete' : extractedData ? 'Ready' : 'Waiting'}
@@ -188,7 +188,7 @@ Acme Corporation`;
               }`}>
                 <FileText className="w-4 h-4" />
               </div>
-              <div>
+              <div className="hidden sm:block">
                 <div className="text-sm font-medium text-slate-900">3. Generate Contract</div>
                 <div className="text-xs text-slate-500">
                   {projectCreated ? 'Next Step' : 'Waiting'}
@@ -203,7 +203,7 @@ Acme Corporation`;
               <div className="w-8 h-8 rounded-full flex items-center justify-center bg-slate-100 text-slate-400">
                 <Receipt className="w-4 h-4" />
               </div>
-              <div>
+              <div className="hidden sm:block">
                 <div className="text-sm font-medium text-slate-900">4. Create Invoice</div>
                 <div className="text-xs text-slate-500">Waiting</div>
               </div>
