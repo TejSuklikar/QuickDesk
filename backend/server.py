@@ -256,7 +256,7 @@ class ContractAgent:
             }
             
             Generate realistic milestones, payment terms, and deadlines based on the project scope and timeline."""
-        ).with_model("openai", "gpt-4o-mini")
+        ).with_model("anthropic", "claude-4-sonnet-20250514")
     
     async def generate_contract_variables(self, project_data: Dict[str, Any], client_data: Dict[str, Any], user_data: Dict[str, Any]) -> Dict[str, Any]:
         try:
