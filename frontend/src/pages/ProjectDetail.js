@@ -772,7 +772,7 @@ ${contract.variables.freelancer_email}`);
                         
                         {editingInvoice === invoice.id ? (
                           <div className="mt-2 space-y-3">
-                            <div className="grid grid-cols-2 gap-3">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                               <div>
                                 <label className="text-xs text-slate-600">Invoice Number</label>
                                 <Input
