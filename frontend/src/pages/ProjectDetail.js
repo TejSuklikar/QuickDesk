@@ -185,6 +185,59 @@ const ProjectDetail = () => {
     </div>
   );
 
+  const handleEditContract = () => {
+    setEditingContract(true);
+    setContractEdits(contract.variables);
+  };
+
+  const handleSaveContract = async () => {
+    try {
+      // Update contract variables (in production, this would be an API call)
+      const updatedContract = { ...contract, variables: contractEdits };
+      setContract(updatedContract);
+      setEditingContract(false);
+      alert('Contract updated successfully!');
+    } catch (error) {
+      console.error('Error updating contract:', error);
+      alert('Error updating contract. Please try again.');
+    }
+  };
+
+  const handleCancelEditContract = () => {
+    setEditingContract(false);
+    setContractEdits({});
+  };
+
+  const handleContractFieldChange = (field, value) => {
+    setContractEdits(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleEditInvoice = (invoice) => {
+    setEditingInvoice(invoice.id);
+    setInvoiceEdits(invoice.details || {});
+  };
+
+  const handleSaveInvoice = async (invoiceId) => {
+    try {
+      // Update invoice details (in production, this would be an API call)
+      const updatedInvoices = invoices.map(inv => 
+        inv.id === invoiceId ? { ...inv, details: invoiceEdits } : inv
+      );
+      setInvoices(updatedInvoices);
+      setEditingInvoice(null);
+      setInvoiceEdits({});
+      alert('Invoice updated successfully!');
+    } catch (error) {
+      console.error('Error updating invoice:', error);
+      alert('Error updating invoice. Please try again.');
+    }
+  };
+
+  const handleCancelEditInvoice = () => {
+    setEditingInvoice(null);
+    setInvoiceEdits({});
+  };
+
   const handleSendInvoice = (invoice) => {
     if (!invoice || !client) return;
     
