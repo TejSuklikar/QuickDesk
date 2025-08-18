@@ -768,19 +768,119 @@ ${contract.variables.freelancer_email}`);
                     
                     {invoice.details && (
                       <div className="mt-4">
-                        <label className="text-sm font-medium text-slate-700">Line Items</label>
-                        <div className="mt-1 space-y-1">
-                          {invoice.details.line_items?.map((item, index) => (
-                            <div key={index} className="flex justify-between text-sm">
-                              <span className="text-slate-600">{item.description}</span>
-                              <span className="text-slate-900 font-medium">${item.amount}</span>
+                        <label className="text-sm font-medium text-slate-700">Invoice Details</label>
+                        
+                        {editingInvoice === invoice.id ? (
+                          <div className="mt-2 space-y-3">
+                            <div className="grid grid-cols-2 gap-3">
+                              <div>
+                                <label className="text-xs text-slate-600">Invoice Number</label>
+                                <Input
+                                  value={invoiceEdits.invoice_number || ''}
+                                  onChange={(e) => setInvoiceEdits(prev => ({ ...prev, invoice_number: e.target.value }))}
+                                />
+                              </div>
+                              <div>
+                                <label className="text-xs text-slate-600">Issue Date</label>
+                                <Input
+                                  type="date"
+                                  value={invoiceEdits.issue_date || ''}
+                                  onChange={(e) => setInvoiceEdits(prev => ({ ...prev, issue_date: e.target.value }))}
+                                />
+                              </div>
                             </div>
-                          ))}
-                        </div>
+                            
+                            <div>
+                              <label className="text-xs text-slate-600">Project Description</label>
+                              <textarea
+                                className="w-full mt-1 p-2 border border-slate-300 rounded-md text-sm"
+                                value={invoiceEdits.project_description || ''}
+                                onChange={(e) => setInvoiceEdits(prev => ({ ...prev, project_description: e.target.value }))}
+                                rows={2}
+                              />
+                            </div>
+                            
+                            <div>
+                              <label className="text-xs text-slate-600">Line Items</label>
+                              <div className="space-y-2">
+                                {(invoiceEdits.line_items || []).map((item, index) => (
+                                  <div key={index} className="grid grid-cols-3 gap-2">
+                                    <Input
+                                      placeholder="Description"
+                                      value={item.description || ''}
+                                      onChange={(e) => {
+                                        const newItems = [...(invoiceEdits.line_items || [])];
+                                        newItems[index] = { ...newItems[index], description: e.target.value };
+                                        setInvoiceEdits(prev => ({ ...prev, line_items: newItems }));
+                                      }}
+                                      className="col-span-2"
+                                    />
+                                    <Input
+                                      type="number"
+                                      placeholder="Amount"
+                                      value={item.amount || ''}
+                                      onChange={(e) => {
+                                        const newItems = [...(invoiceEdits.line_items || [])];
+                                        newItems[index] = { ...newItems[index], amount: parseFloat(e.target.value) || 0 };
+                                        setInvoiceEdits(prev => ({ ...prev, line_items: newItems }));
+                                      }}
+                                    />
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                            
+                            <div className="grid grid-cols-3 gap-3">
+                              <div>
+                                <label className="text-xs text-slate-600">Tax Rate (%)</label>
+                                <Input
+                                  type="number"
+                                  value={invoiceEdits.tax_rate || ''}
+                                  onChange={(e) => setInvoiceEdits(prev => ({ ...prev, tax_rate: parseFloat(e.target.value) || 0 }))}
+                                />
+                              </div>
+                              <div>
+                                <label className="text-xs text-slate-600">Net Terms (days)</label>
+                                <Input
+                                  value={invoiceEdits.net_terms || ''}
+                                  onChange={(e) => setInvoiceEdits(prev => ({ ...prev, net_terms: e.target.value }))}
+                                />
+                              </div>
+                              <div>
+                                <label className="text-xs text-slate-600">Late Fee (%)</label>
+                                <Input
+                                  value={invoiceEdits.late_fee || ''}
+                                  onChange={(e) => setInvoiceEdits(prev => ({ ...prev, late_fee: e.target.value }))}
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        ) : (
+                          <>
+                            <div className="mt-1 text-sm">
+                              <p><strong>Invoice:</strong> {invoice.details.invoice_number}</p>
+                              <p><strong>Issue Date:</strong> {invoice.details.issue_date}</p>
+                              <p><strong>Description:</strong> {invoice.details.project_description}</p>
+                            </div>
+                            
+                            <div className="mt-2">
+                              <label className="text-sm font-medium text-slate-700">Line Items</label>
+                              <div className="mt-1 space-y-1">
+                                {invoice.details.line_items?.map((item, index) => (
+                                  <div key={index} className="flex justify-between text-sm">
+                                    <span className="text-slate-600">{item.description}</span>
+                                    <span className="text-slate-900 font-medium">${item.amount}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          </>
+                        )}
+                        
                         <div className="mt-2 pt-2 border-t border-slate-200">
                           <div className="flex justify-between font-medium">
                             <span>Total Due:</span>
-                            <span className="text-lg">${invoice.details.total_due}</span>
+                            <span className="text-lg">${editingInvoice === invoice.id ? (invoiceEdits.total_due || invoice.amount) : (invoice.details.total_due || invoice.amount)}</span>
                           </div>
                         </div>
                       </div>
