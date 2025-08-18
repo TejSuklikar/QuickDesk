@@ -177,6 +177,18 @@ class IntakeResult(BaseModel):
     confidence: Dict[str, float]
     status: str
 
+# Helper function to clean Claude responses
+def clean_claude_response(response: str) -> str:
+    """Remove markdown code blocks from Claude responses"""
+    response = response.strip()
+    if response.startswith('```json'):
+        response = response[7:]  # Remove ```json
+    elif response.startswith('```'):
+        response = response[3:]   # Remove ```
+    if response.endswith('```'):
+        response = response[:-3]  # Remove trailing ```
+    return response.strip()
+
 # AI Agent Classes
 class IntakeAgent:
     def __init__(self):
