@@ -952,9 +952,12 @@ async def download_invoice_pdf(invoice_id: str):
         if not invoice:
             raise HTTPException(status_code=404, detail="Invoice not found")
         
-        # Get client and project info
-        client = await db.clients.find_one({"id": invoice["client_id"]})
+        # Get project and client info
         project = await db.projects.find_one({"id": invoice["project_id"]})
+        if not project:
+            raise HTTPException(status_code=404, detail="Project not found")
+        
+        client = await db.clients.find_one({"id": project["client_id"]})
         
         # Create PDF in memory
         buffer = io.BytesIO()
