@@ -188,7 +188,7 @@ const Login = ({ onLogin }) => {
         {/* Features preview */}
         <div className="text-center space-y-4">
           <p className="text-sm text-slate-500">Automate your freelance workflow with AI</p>
-          <div className="grid grid-cols-3 gap-4 text-xs">
+          <div className="grid grid-cols-1 xs:grid-cols-3 gap-4 text-xs">
             <div className="flex flex-col items-center space-y-1">
               <div className="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center">
                 <span className="text-amber-600">📧</span>
