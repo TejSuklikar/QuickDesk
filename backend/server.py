@@ -646,6 +646,7 @@ async def get_clients():
 
 @api_router.post("/clients", response_model=Client)
 async def create_client(client_data: ClientCreate):
+    """Create client (internal use - typically called from email processing workflow)"""
     # Note: In production, owner_id should come from JWT token or session
     # For now, we'll use the first user or require proper authentication
     user = await db.users.find_one({})
