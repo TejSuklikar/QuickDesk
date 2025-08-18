@@ -21,10 +21,22 @@ function App() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check for existing session (mock for MVP)
+    // Check for existing session
     const savedUser = localStorage.getItem('freeflow_user');
-    if (savedUser) {
-      setUser(JSON.parse(savedUser));
+    const savedSession = localStorage.getItem('freeflow_session');
+    
+    if (savedUser && savedSession) {
+      const sessionData = JSON.parse(savedSession);
+      const now = Date.now();
+      
+      // Check if session is still valid (24 hours)
+      if (now - sessionData.timestamp < 24 * 60 * 60 * 1000) {
+        setUser(JSON.parse(savedUser));
+      } else {
+        // Session expired, clear data
+        localStorage.removeItem('freeflow_user');
+        localStorage.removeItem('freeflow_session');
+      }
     }
     setLoading(false);
   }, []);
