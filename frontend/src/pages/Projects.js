@@ -128,8 +128,10 @@ const Projects = () => {
           <p className="text-slate-600">Manage your client projects and track progress</p>
         </div>
         <Button className="mt-4 sm:mt-0 bg-gradient-to-r from-blue-500 to-purple-600">
-          <Plus className="w-4 h-4 mr-2" />
-          New Project
+          <Link to="/inbox" className="flex items-center">
+            <Plus className="w-4 h-4 mr-2" />
+            New Project
+          </Link>
         </Button>
       </div>
 
