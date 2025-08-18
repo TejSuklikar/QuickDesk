@@ -471,34 +471,108 @@ ${contract.variables.freelancer_email}`);
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="text-sm font-medium text-slate-700">Client</label>
-                    <p className="text-slate-900">{contract.variables.client_name}</p>
-                    <p className="text-sm text-slate-600">{contract.variables.client_company}</p>
+                    {editingContract ? (
+                      <div className="space-y-2">
+                        <Input
+                          value={contractEdits.client_name || ''}
+                          onChange={(e) => handleContractFieldChange('client_name', e.target.value)}
+                          placeholder="Client name"
+                        />
+                        <Input
+                          value={contractEdits.client_company || ''}
+                          onChange={(e) => handleContractFieldChange('client_company', e.target.value)}
+                          placeholder="Company"
+                        />
+                      </div>
+                    ) : (
+                      <>
+                        <p className="text-slate-900">{contract.variables.client_name}</p>
+                        <p className="text-sm text-slate-600">{contract.variables.client_company}</p>
+                      </>
+                    )}
                   </div>
                   
                   <div>
                     <label className="text-sm font-medium text-slate-700">Freelancer</label>
-                    <p className="text-slate-900">{contract.variables.freelancer_name}</p>
-                    <p className="text-sm text-slate-600">{contract.variables.freelancer_business}</p>
+                    {editingContract ? (
+                      <div className="space-y-2">
+                        <Input
+                          value={contractEdits.freelancer_name || ''}
+                          onChange={(e) => handleContractFieldChange('freelancer_name', e.target.value)}
+                          placeholder="Freelancer name"
+                        />
+                        <Input
+                          value={contractEdits.freelancer_business || ''}
+                          onChange={(e) => handleContractFieldChange('freelancer_business', e.target.value)}
+                          placeholder="Business name"
+                        />
+                      </div>
+                    ) : (
+                      <>
+                        <p className="text-slate-900">{contract.variables.freelancer_name}</p>
+                        <p className="text-sm text-slate-600">{contract.variables.freelancer_business}</p>
+                      </>
+                    )}
                   </div>
                   
                   <div>
                     <label className="text-sm font-medium text-slate-700">Total Amount</label>
-                    <p className="text-slate-900 font-medium">${contract.variables.project_budget}</p>
+                    {editingContract ? (
+                      <Input
+                        type="number"
+                        value={contractEdits.project_budget || ''}
+                        onChange={(e) => handleContractFieldChange('project_budget', parseFloat(e.target.value) || 0)}
+                        placeholder="0"
+                      />
+                    ) : (
+                      <p className="text-slate-900 font-medium">${contract.variables.project_budget}</p>
+                    )}
                   </div>
                   
                   <div>
                     <label className="text-sm font-medium text-slate-700">Payment Terms</label>
-                    <p className="text-slate-900">{contract.variables.payment_terms}</p>
+                    {editingContract ? (
+                      <Input
+                        value={contractEdits.payment_terms || ''}
+                        onChange={(e) => handleContractFieldChange('payment_terms', e.target.value)}
+                        placeholder="Payment terms"
+                      />
+                    ) : (
+                      <p className="text-slate-900">{contract.variables.payment_terms}</p>
+                    )}
                   </div>
                   
                   <div>
                     <label className="text-sm font-medium text-slate-700">Project Timeline</label>
-                    <p className="text-slate-900">{contract.variables.start_date} to {contract.variables.end_date}</p>
+                    {editingContract ? (
+                      <div className="grid grid-cols-2 gap-2">
+                        <Input
+                          type="date"
+                          value={contractEdits.start_date || ''}
+                          onChange={(e) => handleContractFieldChange('start_date', e.target.value)}
+                        />
+                        <Input
+                          type="date"
+                          value={contractEdits.end_date || ''}
+                          onChange={(e) => handleContractFieldChange('end_date', e.target.value)}
+                        />
+                      </div>
+                    ) : (
+                      <p className="text-slate-900">{contract.variables.start_date} to {contract.variables.end_date}</p>
+                    )}
                   </div>
                   
                   <div>
                     <label className="text-sm font-medium text-slate-700">Net Terms</label>
-                    <p className="text-slate-900">{contract.variables.net_terms} days</p>
+                    {editingContract ? (
+                      <Input
+                        value={contractEdits.net_terms || ''}
+                        onChange={(e) => handleContractFieldChange('net_terms', e.target.value)}
+                        placeholder="30"
+                      />
+                    ) : (
+                      <p className="text-slate-900">{contract.variables.net_terms} days</p>
+                    )}
                   </div>
                 </div>
                 
