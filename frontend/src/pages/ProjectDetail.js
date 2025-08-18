@@ -24,7 +24,6 @@ import { Badge } from '../components/ui/badge';
 import { Input } from '../components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import axios from 'axios';
-import { format } from 'date-fns';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -112,7 +111,7 @@ const ProjectDetail = ({ user }) => {
       // Update project status
       setProject(prev => ({ ...prev, status: 'Billing' }));
       
-      alert(`💰 Invoice Created!\n\nInvoice ID: ${response.data.id}\nAmount: $${response.data.amount}\nDue: ${format(new Date(response.data.due_date), 'MMM d, yyyy')}\n\n🎯 Invoice is ready to send to client!`);
+      alert(`💰 Invoice Created!\n\nInvoice ID: ${response.data.id}\nAmount: $${response.data.amount}\nDue: ${new Date(response.data.due_date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}\n\n🎯 Invoice is ready to send to client!`);
       
     } catch (error) {
       console.error('Error creating invoice:', error);
@@ -251,7 +250,7 @@ Please find your invoice for "${project.title}".
 Invoice Details:
 - Invoice Number: ${invoice.details?.invoice_number || invoice.id.substring(0, 8)}
 - Amount Due: $${invoice.amount}
-- Due Date: ${format(new Date(invoice.due_date), 'MMMM d, yyyy')}
+- Due Date: ${new Date(invoice.due_date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
 
 Please process payment at your earliest convenience. If you have any questions about this invoice, please don't hesitate to reach out.
 
@@ -381,7 +380,7 @@ ${user.email}`);
               <div>
                 <label className="text-sm font-medium text-slate-700">Created</label>
                 <p className="text-slate-600 mt-1">
-                  {format(new Date(project.created_at), 'MMMM d, yyyy \'at\' h:mm a')}
+                  {new Date(project.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit' })}
                 </p>
               </div>
             </div>
@@ -768,12 +767,12 @@ ${user.email}`);
                       
                       <div>
                         <label className="text-sm font-medium text-slate-700">Due Date</label>
-                        <p className="text-slate-900">{format(new Date(invoice.due_date), 'MMM d, yyyy')}</p>
+                        <p className="text-slate-900">{new Date(invoice.due_date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</p>
                       </div>
                       
                       <div>
                         <label className="text-sm font-medium text-slate-700">Issued</label>
-                        <p className="text-slate-900">{format(new Date(invoice.created_at), 'MMM d, yyyy')}</p>
+                        <p className="text-slate-900">{new Date(invoice.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</p>
                       </div>
                     </div>
                     
