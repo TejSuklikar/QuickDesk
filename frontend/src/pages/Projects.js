@@ -26,7 +26,6 @@ import {
   DropdownMenuTrigger 
 } from '../components/ui/dropdown-menu';
 import axios from 'axios';
-import { format } from 'date-fns';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -247,7 +246,7 @@ const Projects = () => {
                   
                   <div className="flex items-center space-x-2 text-slate-500">
                     <Clock className="w-4 h-4" />
-                    <span>Created {format(new Date(project.created_at), 'MMM d, yyyy')}</span>
+                    <span>Created {new Date(project.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</span>
                   </div>
                 </div>
 
