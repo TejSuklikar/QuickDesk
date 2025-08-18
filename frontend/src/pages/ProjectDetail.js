@@ -396,7 +396,7 @@ ${contract.variables.freelancer_email}`);
               </div>
               
               {client?.company && (
-                <div className="flex flex-col space-y-3 sm:flex-row sm:items-center sm:space-x-3 sm:space-y-0">
+                <div className="flex items-center space-x-3">
                   <Building2 className="w-4 h-4 text-slate-500" />
                   <span className="text-slate-900">{client.company}</span>
                 </div>
