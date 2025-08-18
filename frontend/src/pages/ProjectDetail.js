@@ -35,6 +35,10 @@ const ProjectDetail = () => {
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
   const [creating, setCreating] = useState(false);
+  const [editingContract, setEditingContract] = useState(false);
+  const [contractEdits, setContractEdits] = useState({});
+  const [editingInvoice, setEditingInvoice] = useState(null);
+  const [invoiceEdits, setInvoiceEdits] = useState({});
 
   useEffect(() => {
     loadProjectData();
