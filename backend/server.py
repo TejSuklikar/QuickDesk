@@ -229,7 +229,7 @@ class IntakeAgent:
 class ContractAgent:
     def __init__(self):
         self.llm = LlmChat(
-            api_key=os.environ['EMERGENT_LLM_KEY'],
+            api_key=os.environ['CLAUDE_API_KEY'],
             session_id="contract_agent",
             system_message="""You are an AI contract agent. Generate professional freelance contract variables.
             
