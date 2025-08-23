@@ -25,7 +25,7 @@ Works seamlessly on desktop, tablet, and mobile devices.
 
 ## 🔧 Tech Stack
 
-- **Frontend**: React 19, Tailwind CSS, shadcn/ui
+- **Frontend**: React 19, Tailwind CSS
 - **Backend**: Python FastAPI, MongoDB Atlas
 - **AI**: Claude Sonnet 4 for intelligent document processing
 - **Deployment**: Vercel (Frontend + Backend)
