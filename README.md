@@ -1,10 +1,10 @@
-# 🚀 FreeFlow
+# 🚀 QuickDesk
 
 **AI-Powered Workflow Automation for Freelancers**
 
-FreeFlow transforms your freelance business with intelligent automation. From client inquiries to contract generation to invoice management, let AI handle the repetitive tasks while you focus on delivering exceptional work.
+QuickDesk transforms your freelance business with intelligent automation. From client inquiries to contract generation to invoice management, let AI handle the repetitive tasks while you focus on delivering exceptional work.
 
-![FreeFlow Dashboard](https://img.shields.io/badge/Status-Live-brightgreen) ![React](https://img.shields.io/badge/React-19.0-blue) ![Python](https://img.shields.io/badge/Python-FastAPI-green) ![Claude](https://img.shields.io/badge/AI-Claude%20Sonnet%204-purple)
+![QuickDesk Dashboard](https://img.shields.io/badge/Status-Live-brightgreen) ![React](https://img.shields.io/badge/React-19.0-blue) ![Python](https://img.shields.io/badge/Python-FastAPI-green) ![Claude](https://img.shields.io/badge/AI-Claude%20Sonnet%204-purple)
 
 ## ✨ Features
 
