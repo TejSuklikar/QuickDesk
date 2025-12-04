@@ -27,6 +27,9 @@ import axios from 'axios';
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
 const Inbox = () => {
+  // Added for demo - Get user from localStorage
+  const user = JSON.parse(localStorage.getItem('freeflow_user'));
+
   const [rawMessage, setRawMessage] = useState('');
   const [extractedData, setExtractedData] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -256,14 +259,18 @@ Acme Corporation`;
             </div>
           </Card>
 
-          {/* AI Processing Status */}
+          {/* AI Processing Status - Added for demo - Enhanced loading state */}
           {loading && (
-            <Card className="p-6 bg-blue-50 border-blue-200">
-              <div className="flex items-center space-x-3">
-                <Bot className="w-5 h-5 text-blue-500 animate-pulse" />
+            <Card className="p-8 bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
+              <div className="flex flex-col items-center text-center space-y-4">
+                <div className="relative">
+                  <div className="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+                  <Bot className="w-6 h-6 text-blue-600 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" />
+                </div>
                 <div>
-                  <h3 className="font-medium text-blue-900">AI Intake Agent Working</h3>
-                  <p className="text-sm text-blue-700">Analyzing email and extracting structured data...</p>
+                  <h3 className="font-semibold text-blue-900 text-lg mb-1">AI Processing...</h3>
+                  <p className="text-blue-700">Analyzing email with Claude Sonnet 4</p>
+                  <p className="text-sm text-blue-600 mt-2">This usually takes 3-5 seconds</p>
                 </div>
               </div>
             </Card>

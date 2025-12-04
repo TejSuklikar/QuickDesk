@@ -30,6 +30,9 @@ import axios from 'axios';
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
 const Projects = () => {
+  // Added for demo - Get user from localStorage
+  const user = JSON.parse(localStorage.getItem('freeflow_user'));
+
   const [projects, setProjects] = useState([]);
   const [clients, setClients] = useState([]);
   const [loading, setLoading] = useState(true);

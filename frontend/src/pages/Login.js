@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { User, Lock, Zap } from 'lucide-react';
+import { User, Lock, Zap, Play } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Card } from '../components/ui/card';
@@ -15,6 +15,7 @@ const Login = ({ onLogin }) => {
     password: ''
   });
   const [loading, setLoading] = useState(false);
+  const [demoLoading, setDemoLoading] = useState(false);
   const [error, setError] = useState('');
 
   const handleChange = (e) => {
@@ -29,12 +30,12 @@ const Login = ({ onLogin }) => {
 
     try {
       const endpoint = isLogin ? '/api/auth/login' : '/api/auth/register';
-      const payload = isLogin 
+      const payload = isLogin
         ? { email: formData.email, password: formData.password }
         : formData;
 
       const response = await axios.post(`${BACKEND_URL}${endpoint}`, payload);
-      
+
       if (response.data.user_id) {
         onLogin({
           id: response.data.user_id,
@@ -46,6 +47,35 @@ const Login = ({ onLogin }) => {
       setError(err.response?.data?.detail || 'Authentication failed');
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Added for demo - Quick demo login
+  const handleDemoLogin = async () => {
+    setDemoLoading(true);
+    setError('');
+
+    try {
+      // First, seed the demo data
+      await axios.post(`${BACKEND_URL}/api/dev/seed-demo`);
+
+      // Then log in with demo credentials
+      const response = await axios.post(`${BACKEND_URL}/api/auth/login`, {
+        email: 'demo@quickdesk.com',
+        password: 'demo123'
+      });
+
+      if (response.data.user_id) {
+        onLogin({
+          id: response.data.user_id,
+          name: response.data.name,
+          email: 'demo@quickdesk.com'
+        });
+      }
+    } catch (err) {
+      setError(err.response?.data?.detail || 'Demo login failed');
+    } finally {
+      setDemoLoading(false);
     }
   };
 
@@ -141,11 +171,31 @@ const Login = ({ onLogin }) => {
               <Button
                 type="submit"
                 className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
-                disabled={loading}
+                disabled={loading || demoLoading}
               >
                 {loading ? 'Please wait...' : isLogin ? 'Sign In' : 'Create Account'}
               </Button>
             </form>
+
+            {/* Added for demo - Quick Demo Login Button */}
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-slate-200"></div>
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-white px-2 text-slate-500">Or</span>
+              </div>
+            </div>
+
+            <Button
+              onClick={handleDemoLogin}
+              variant="outline"
+              className="w-full border-2 border-blue-200 hover:bg-blue-50 hover:border-blue-300 text-blue-600"
+              disabled={loading || demoLoading}
+            >
+              <Play className="w-4 h-4 mr-2" />
+              {demoLoading ? 'Setting up demo...' : 'Quick Demo Login'}
+            </Button>
 
             <div className="text-center">
               <button
