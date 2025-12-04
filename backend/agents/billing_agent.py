@@ -114,7 +114,7 @@ INSTRUCTIONS:
 Ensure ALL required fields are present in your JSON response."""
             
             response = self.client.messages.create(
-                model="claude-3-5-sonnet-20240620",
+                model="claude-3-5-sonnet-20241022",
                 max_tokens=1000,
                 system=self.system_message,
                 messages=[{"role": "user", "content": prompt}]
