@@ -921,26 +921,147 @@ async def root():
     return {"message": "FreeFlow API is running", "status": "healthy"}
 
 # Development endpoints
+@api_router.post("/dev/seed-demo")
+async def seed_demo_data():
+    """Create demo user with pre-populated data for presentations"""
+    try:
+        # Added for demo - Create or update demo user
+        demo_user_id = "demo-user-123"
+        demo_email = "demo@quickdesk.com"
+
+        # Check if demo user already exists
+        existing_user = await db.users.find_one({"email": demo_email})
+
+        if existing_user:
+            # Update existing user
+            await db.users.update_one(
+                {"email": demo_email},
+                {"$set": {
+                    "id": demo_user_id,
+                    "name": "Demo User",
+                    "password_hash": "demo123"  # Simple password for demo
+                }}
+            )
+            logger.info("Demo user updated")
+        else:
+            # Create new demo user
+            demo_user = User(
+                id=demo_user_id,
+                name="Demo User",
+                email=demo_email,
+                password_hash="demo123"
+            )
+            await db.users.insert_one(demo_user.dict())
+            logger.info("Demo user created")
+
+        # Create sample client
+        demo_client_id = "demo-client-acme"
+        existing_client = await db.clients.find_one({"id": demo_client_id})
+
+        if not existing_client:
+            demo_client = Client(
+                id=demo_client_id,
+                name="Sarah Johnson",
+                email="sarah@acmecorp.com",
+                company="Acme Corporation",
+                phone="555-0123",
+                owner_id=demo_user_id
+            )
+            await db.clients.insert_one(demo_client.dict())
+            logger.info("Demo client created")
+
+        # Create sample project
+        demo_project_id = "demo-project-redesign"
+        existing_project = await db.projects.find_one({"id": demo_project_id})
+
+        if not existing_project:
+            demo_project = Project(
+                id=demo_project_id,
+                client_id=demo_client_id,
+                title="Website Redesign Project",
+                description="Modern, mobile-friendly landing page redesign with responsive design, improved UX, and brand alignment",
+                budget=5000.0,
+                timeline="4 weeks",
+                status=ProjectStatus.INTAKE,
+                owner_id=demo_user_id
+            )
+            await db.projects.insert_one(demo_project.dict())
+            logger.info("Demo project created")
+
+        # Create sample contract
+        demo_contract_id = "demo-contract-001"
+        existing_contract = await db.contracts.find_one({"id": demo_contract_id})
+
+        if not existing_contract:
+            demo_contract = Contract(
+                id=demo_contract_id,
+                project_id=demo_project_id,
+                variables={
+                    "client_name": "Sarah Johnson",
+                    "client_company": "Acme Corporation",
+                    "client_email": "sarah@acmecorp.com",
+                    "client_legal_name": "Acme Corporation LLC",
+                    "freelancer_name": "Demo User",
+                    "freelancer_business": "Demo Digital Services",
+                    "freelancer_email": "demo@quickdesk.com",
+                    "project_description": "Modern, mobile-friendly landing page redesign with responsive design, improved UX, and brand alignment",
+                    "project_budget": 5000.0,
+                    "total_amount": 5000.0,
+                    "payment_terms": "50% upfront, 50% on completion",
+                    "start_date": (datetime.utcnow()).strftime("%Y-%m-%d"),
+                    "end_date": (datetime.utcnow() + timedelta(days=28)).strftime("%Y-%m-%d"),
+                    "net_terms": "30",
+                    "late_fee": "1.5",
+                    "jurisdiction": "State of California",
+                    "deliverables_list": [
+                        "Responsive homepage design",
+                        "Mobile-optimized layout",
+                        "Brand style guide implementation",
+                        "Performance optimization"
+                    ],
+                    "milestone_1": "Design mockups and client approval (Week 1)",
+                    "milestone_2": "Development and initial testing (Week 2-3)",
+                    "milestone_3": "Final revisions and launch (Week 4)"
+                },
+                status=ContractStatus.DRAFT
+            )
+            await db.contracts.insert_one(demo_contract.dict())
+            logger.info("Demo contract created")
+
+        return {
+            "message": "Demo data seeded successfully",
+            "user_id": demo_user_id,
+            "email": demo_email,
+            "password": "demo123",
+            "client_id": demo_client_id,
+            "project_id": demo_project_id,
+            "contract_id": demo_contract_id
+        }
+
+    except Exception as e:
+        logger.error(f"Demo seed error: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to seed demo data: {str(e)}")
+
 @api_router.delete("/dev/cleanup")
 async def cleanup_demo_data():
     """Clean up any demo/test data"""
     try:
         # Remove demo users
         await db.users.delete_many({"email": {"$regex": "demo|test"}})
-        
+
         # Remove projects/clients/contracts/invoices associated with demo users
         demo_clients = await db.clients.find({"owner_id": {"$regex": "demo"}}).to_list(length=None)
         demo_client_ids = [client["id"] for client in demo_clients]
-        
+
         if demo_client_ids:
             await db.projects.delete_many({"client_id": {"$in": demo_client_ids}})
             await db.contracts.delete_many({"client_id": {"$in": demo_client_ids}})
             await db.invoices.delete_many({"client_id": {"$in": demo_client_ids}})
             await db.clients.delete_many({"id": {"$in": demo_client_ids}})
-        
+
         # Clean up any orphaned data
         await db.agent_events.delete_many({"entity_id": {"$regex": "demo"}})
-        
+
         return {"message": "Demo data cleaned up successfully"}
     except Exception as e:
         logger.error(f"Cleanup error: {e}")

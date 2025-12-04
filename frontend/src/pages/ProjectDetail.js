@@ -40,6 +40,8 @@ const ProjectDetail = ({ user }) => {
   const [contractEdits, setContractEdits] = useState({});
   const [editingInvoice, setEditingInvoice] = useState(null);
   const [invoiceEdits, setInvoiceEdits] = useState({});
+  // Added for demo - Success modal state
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   useEffect(() => {
     loadProjectData();
@@ -74,20 +76,24 @@ const ProjectDetail = ({ user }) => {
 
   const handleGenerateContract = async () => {
     setGenerating(true);
-    
+
     try {
       const response = await axios.post(`${BACKEND_URL}/api/contracts/generate`, {
         project_id: id,
         template_id: "standard_freelance_contract"
       });
-      
+
       setContract(response.data);
-      
+
       // Update project status
       setProject(prev => ({ ...prev, status: 'Contract' }));
-      
-      alert(`✅ Contract Generated!\n\nContract ID: ${response.data.id}\nClient: ${response.data.variables.client_legal_name}\nAmount: $${response.data.variables.total_amount}\n\n🎯 Next: Send contract for signature`);
-      
+
+      // Added for demo - Show success modal instead of alert
+      setShowSuccessModal(true);
+      setTimeout(() => {
+        setShowSuccessModal(false);
+      }, 2000);
+
     } catch (error) {
       console.error('Error generating contract:', error);
       alert('Error generating contract. Please try again.');
@@ -324,6 +330,21 @@ ${user.email}`);
 
   return (
     <div className="space-y-6 fade-in">
+      {/* Added for demo - Success Modal */}
+      {showSuccessModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 animate-fade-in">
+          <Card className="p-8 max-w-md mx-4 text-center animate-scale-in">
+            <div className="flex justify-center mb-4">
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center animate-bounce">
+                <CheckCircle className="w-10 h-10 text-green-600" />
+              </div>
+            </div>
+            <h2 className="text-2xl font-bold text-slate-900 mb-2">Contract Generated!</h2>
+            <p className="text-slate-600">Professional service agreement ready for review</p>
+          </Card>
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
         <div className="flex flex-col space-y-2 sm:flex-row sm:items-center sm:space-x-4 sm:space-y-0">
