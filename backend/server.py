@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter, HTTPException, BackgroundTasks, Response, Header
+from fastapi import FastAPI, APIRouter, HTTPException, Response, Header
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -10,7 +10,6 @@ from typing import List, Optional, Dict, Any
 import uuid
 from datetime import datetime, timedelta
 from enum import Enum
-import asyncio
 from reportlab.lib.pagesizes import letter, A4
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
@@ -18,8 +17,6 @@ from reportlab.lib.colors import black, blue, grey
 from reportlab.lib.units import inch
 from reportlab.lib import colors
 import io
-import json
-from reportlab.pdfgen import canvas
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
