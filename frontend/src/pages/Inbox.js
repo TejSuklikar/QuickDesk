@@ -38,6 +38,7 @@ const Inbox = () => {
   const [processing, setProcessing] = useState(false);
   const [projectCreated, setProjectCreated] = useState(false);
   const [projectId, setProjectId] = useState(null);
+  const [showProjectSuccessModal, setShowProjectSuccessModal] = useState(false);
 
   // Example email for demonstration
   const exampleEmail = `Hi there!
@@ -95,11 +96,12 @@ Acme Corporation`;
       if (response.data.project_id) {
         setProjectId(response.data.project_id);
         setProjectCreated(true);
-        
-        // Show success message
+
+        // Show success modal
+        setShowProjectSuccessModal(true);
         setTimeout(() => {
-          alert(`✅ Project Created!\n\nName: ${extractedData.project.title}\nClient: ${extractedData.client.name}\nBudget: $${extractedData.project.budget}\n\n🎯 Next: Go to Projects page to generate contract`);
-        }, 500);
+          setShowProjectSuccessModal(false);
+        }, 2500);
       }
     } catch (error) {
       console.error('Error creating project:', error);
@@ -118,6 +120,22 @@ Acme Corporation`;
 
   return (
     <div className="space-y-6 fade-in">
+      {/* Project Success Modal */}
+      {showProjectSuccessModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 animate-fade-in">
+          <Card className="p-8 max-w-md mx-4 text-center animate-scale-in">
+            <div className="flex justify-center mb-4">
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center animate-bounce">
+                <CheckCircle className="w-10 h-10 text-green-600" />
+              </div>
+            </div>
+            <h2 className="text-2xl font-bold text-slate-900 mb-2">Project Created!</h2>
+            <p className="text-slate-600 mb-2">{extractedData?.project.title}</p>
+            <p className="text-sm text-slate-500">Ready to generate contract</p>
+          </Card>
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <div>
@@ -479,50 +497,6 @@ Acme Corporation`;
                           value={extractedData.project.timeline || ''}
                           onChange={(e) => handleFieldUpdate('project', 'timeline', e.target.value)}
                           placeholder="e.g., 30 days"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Confidence Scores */}
-                <div className="space-y-3 mb-6">
-                  <h3 className="font-medium text-slate-900">AI Confidence Scores</h3>
-
-                  <div className="space-y-3">
-                    <div>
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-sm text-slate-600">Budget</span>
-                        <span className="text-sm font-medium text-slate-900">
-                          {Math.round(extractedData.confidence.budget * 100)}%
-                        </span>
-                      </div>
-                      <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
-                        <div
-                          className="h-full transition-all duration-300 rounded-full"
-                          style={{
-                            width: `${Math.round(extractedData.confidence.budget * 100)}%`,
-                            backgroundColor: extractedData.confidence.budget >= 0.8 ? '#10b981' :
-                                           extractedData.confidence.budget >= 0.6 ? '#f59e0b' : '#ef4444'
-                          }}
-                        />
-                      </div>
-                    </div>
-                    <div>
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-sm text-slate-600">Timeline</span>
-                        <span className="text-sm font-medium text-slate-900">
-                          {Math.round(extractedData.confidence.timeline * 100)}%
-                        </span>
-                      </div>
-                      <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
-                        <div
-                          className="h-full transition-all duration-300 rounded-full"
-                          style={{
-                            width: `${Math.round(extractedData.confidence.timeline * 100)}%`,
-                            backgroundColor: extractedData.confidence.timeline >= 0.8 ? '#10b981' :
-                                           extractedData.confidence.timeline >= 0.6 ? '#f59e0b' : '#ef4444'
-                          }}
                         />
                       </div>
                     </div>
