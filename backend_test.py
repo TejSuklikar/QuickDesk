@@ -5,7 +5,7 @@ from datetime import datetime
 import time
 
 class FreeFlowAPITester:
-    def __init__(self, base_url="https://70eac5bb-5ba5-40af-bb84-986904fe3790.preview.emergentagent.com/api"):
+    def __init__(self, base_url="http://localhost:8001/api"):
         self.base_url = base_url
         self.tests_run = 0
         self.tests_passed = 0

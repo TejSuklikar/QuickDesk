@@ -114,7 +114,7 @@ docker build -t freeflow .
 # Run
 docker run -p 3000:3000 -p 8001:8001 \
   -e MONGO_URL=your-mongo-url \
-  -e EMERGENT_LLM_KEY=your-key \
+  -e CLAUDE_API_KEY=your-key \
   freeflow
 ```
 
