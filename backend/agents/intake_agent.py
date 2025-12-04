@@ -84,7 +84,7 @@ Return ONLY valid JSON in this exact structure (no extra text):
     async def process_inquiry(self, raw_text: str) -> Dict[str, Any]:
         try:
             response = self.client.messages.create(
-                model="claude-3-5-sonnet-20241022",
+                model="claude-3-5-sonnet-20240620",
                 max_tokens=1500,
                 system=self.system_message,
                 messages=[{
