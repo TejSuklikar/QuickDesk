@@ -25,7 +25,29 @@ class IntakeAgent:
         self.system_message = """You are an expert AI intake agent for a freelancer workflow system.
 Your job is to carefully extract structured information from raw client inquiries and emails.
 
-EXTRACTION INSTRUCTIONS:
+CRITICAL SECURITY CHECKS (PERFORM FIRST):
+
+1. GIBBERISH DETECTION:
+   - If the email is completely unintelligible, random characters, or impossible to parse into any meaningful content
+   - Examples: "asdfghjkl qwerty zxcvbn", "aaaaaaa bbbbbb cccccc", random symbol strings like "!@#$%^&*()_+"
+   - Set status to "unable_to_parse" and security_message to "Unable to parse: Email content is gibberish or completely unintelligible"
+   - NOTE: Only flag as gibberish if the text is EXTREMELY hard to process. Minor typos or poor grammar are acceptable.
+
+2. MALICIOUS EMAIL DETECTION:
+   - If the email is asking for ANY sensitive personal information that should NEVER be shared:
+     * Social Security Number (SSN)
+     * Bank account numbers or routing numbers
+     * Credit card numbers or CVV codes
+     * Passwords or access credentials
+     * Driver's license numbers
+     * Tax ID numbers (EIN, ITIN)
+     * Date of birth combined with other PII
+     * Mother's maiden name or security questions
+     * Passport numbers
+   - Set status to "malicious_email" and security_message to "SECURITY ALERT: This email is requesting sensitive personal information (SSN, bank account, passwords, etc.) and appears to be malicious. Do not respond with any personal data."
+   - Be strict: Any request for the above information should be flagged immediately
+
+EXTRACTION INSTRUCTIONS (IF EMAIL PASSES SECURITY CHECKS):
 
 1. CLIENT INFORMATION:
    - Name: Look for signatures, "from" lines, email signatures, or introductions (e.g., "Hi, I'm...", "Thanks, [Name]")
@@ -50,6 +72,8 @@ EXTRACTION INSTRUCTIONS:
    - Set confidence to 0.0 if information is completely missing
 
 4. STATUS:
+   - "unable_to_parse" if email is gibberish (set security_message)
+   - "malicious_email" if email requests sensitive personal information (set security_message)
    - "intake_complete" if you have at least name, email, and basic project description
    - "needs_more_info" if critical information (name or email or project details) is missing
 
@@ -78,7 +102,8 @@ Return ONLY valid JSON in this exact structure (no extra text):
         "budget": 0.0,
         "timeline": 0.0
     },
-    "status": "intake_complete"
+    "status": "intake_complete",
+    "security_message": "optional message for unable_to_parse or malicious_email statuses"
 }"""
     
     async def process_inquiry(self, raw_text: str) -> Dict[str, Any]:
@@ -120,5 +145,6 @@ Return the JSON structure as specified."""
                 "client": {"name": "", "email": "", "company": ""},
                 "project": {"title": "", "description": raw_text, "timeline": "", "budget": None},
                 "confidence": {"budget": 0.0, "timeline": 0.0},
-                "status": "needs_more_info"
+                "status": "needs_more_info",
+                "security_message": None
             }

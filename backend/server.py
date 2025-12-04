@@ -176,6 +176,7 @@ class IntakeResult(BaseModel):
     project: Dict[str, Any]
     confidence: Dict[str, float]
     status: str
+    security_message: Optional[str] = None
 
 # Import AI Agents from separate files
 from agents.intake_agent import IntakeAgent
@@ -510,10 +511,19 @@ async def parse_email_inquiry(intake_data: IntakeInput):
         # Use AI to extract information
         result = await intake_agent.process_inquiry(intake_data.raw_text)
         
-        # Log the intake event
+        # Log the intake event based on status
+        if result["status"] == "unable_to_parse":
+            event_kind = EventKind.INTAKE_NEEDS_INFO
+        elif result["status"] == "malicious_email":
+            event_kind = EventKind.INTAKE_NEEDS_INFO
+        elif result["status"] == "intake_complete":
+            event_kind = EventKind.INTAKE_COMPLETED
+        else:
+            event_kind = EventKind.INTAKE_NEEDS_INFO
+
         await log_agent_event(
             trace_id=trace_id,
-            kind=EventKind.INTAKE_COMPLETED if result["status"] == "intake_complete" else EventKind.INTAKE_NEEDS_INFO,
+            kind=event_kind,
             entity_type="intake",
             entity_id=trace_id,
             payload=result

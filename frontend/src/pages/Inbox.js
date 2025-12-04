@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { 
-  Mail, 
-  Bot, 
-  CheckCircle, 
-  AlertCircle, 
-  Edit3, 
+import {
+  Mail,
+  Bot,
+  CheckCircle,
+  AlertCircle,
+  Edit3,
   Send,
   Sparkles,
   ArrowRight,
@@ -15,7 +15,9 @@ import {
   Receipt,
   Clock,
   Eye,
-  Play
+  Play,
+  XCircle,
+  ShieldAlert
 } from 'lucide-react';
 import { Card } from '../components/ui/card';
 import { Button } from '../components/ui/button';
@@ -275,19 +277,96 @@ Acme Corporation`;
               <p className="text-green-700 mb-6">
                 <strong>{extractedData?.project.title}</strong> for {extractedData?.client.name}
               </p>
-              
+
               <div className="space-y-3">
-                <Button 
+                <Button
                   onClick={() => window.location.href = '/projects'}
                   className="w-full bg-gradient-to-r from-blue-500 to-purple-600"
                 >
                   <FileText className="w-4 h-4 mr-2" />
                   Go to Projects → Generate Contract
                 </Button>
-                
+
                 <Button variant="outline" onClick={handleStartOver} className="w-full">
                   <Mail className="w-4 h-4 mr-2" />
                   Process Another Email
+                </Button>
+              </div>
+            </Card>
+          ) : extractedData && extractedData.status === 'malicious_email' ? (
+            /* Malicious Email Alert */
+            <Card className="p-8 text-center bg-gradient-to-r from-red-50 to-rose-50 border-red-300">
+              <ShieldAlert className="w-16 h-16 text-red-600 mx-auto mb-4" />
+              <h2 className="text-xl font-semibold text-red-900 mb-3">🚨 Security Alert: Malicious Email</h2>
+              <div className="bg-red-100 border border-red-300 rounded-lg p-4 mb-6">
+                <p className="text-red-800 text-sm leading-relaxed">
+                  {extractedData.security_message || 'This email is requesting sensitive personal information and appears to be malicious.'}
+                </p>
+              </div>
+
+              <div className="text-left mb-6 bg-white/50 rounded-lg p-4">
+                <h3 className="font-semibold text-red-900 mb-2">⚠️ Warning Signs Detected:</h3>
+                <ul className="text-sm text-red-700 space-y-1 list-disc list-inside">
+                  <li>Requests for Social Security Number (SSN)</li>
+                  <li>Requests for bank account or credit card numbers</li>
+                  <li>Requests for passwords or credentials</li>
+                  <li>Requests for other sensitive personal information</li>
+                </ul>
+              </div>
+
+              <div className="space-y-3">
+                <div className="bg-red-100 border border-red-300 rounded p-3 text-sm text-red-800">
+                  <strong>DO NOT RESPOND</strong> to this email with any personal information
+                </div>
+
+                <Button
+                  variant="outline"
+                  onClick={handleStartOver}
+                  className="w-full border-red-300 hover:bg-red-50"
+                >
+                  <XCircle className="w-4 h-4 mr-2" />
+                  Discard & Process Another Email
+                </Button>
+              </div>
+            </Card>
+          ) : extractedData && extractedData.status === 'unable_to_parse' ? (
+            /* Unable to Parse - Gibberish Email */
+            <Card className="p-8 text-center bg-gradient-to-r from-yellow-50 to-amber-50 border-yellow-300">
+              <AlertCircle className="w-16 h-16 text-yellow-600 mx-auto mb-4" />
+              <h2 className="text-xl font-semibold text-yellow-900 mb-3">Unable to Parse Email</h2>
+              <div className="bg-yellow-100 border border-yellow-300 rounded-lg p-4 mb-6">
+                <p className="text-yellow-800 text-sm leading-relaxed">
+                  {extractedData.security_message || 'The email content appears to be gibberish or completely unintelligible.'}
+                </p>
+              </div>
+
+              <div className="text-left mb-6 bg-white/50 rounded-lg p-4">
+                <h3 className="font-semibold text-yellow-900 mb-2">Possible Reasons:</h3>
+                <ul className="text-sm text-yellow-700 space-y-1 list-disc list-inside">
+                  <li>Email contains random characters or symbols</li>
+                  <li>Content is corrupted or improperly formatted</li>
+                  <li>Email body is empty or meaningless text</li>
+                  <li>Possible spam or automated message</li>
+                </ul>
+              </div>
+
+              <div className="space-y-3">
+                <Button
+                  variant="outline"
+                  onClick={() => setExtractedData(null)}
+                  className="w-full border-yellow-300 hover:bg-yellow-50"
+                >
+                  <RefreshCw className="w-4 h-4 mr-2" />
+                  Try Different Email
+                </Button>
+
+                <Button
+                  variant="outline"
+                  onClick={handleStartOver}
+                  className="w-full"
+                >
+                  <XCircle className="w-4 h-4 mr-2" />
+                  Start Over
                 </Button>
               </div>
             </Card>
