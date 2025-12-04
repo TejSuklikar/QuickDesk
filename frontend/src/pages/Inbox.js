@@ -65,7 +65,7 @@ Acme Corporation`;
       setExtractedData(response.data);
     } catch (error) {
       console.error('Error processing email:', error);
-      alert('Error processing email. Please check your connection and try again.');
+      alert('Unable to process email. Please try again.');
       setExtractedData(null);
     } finally {
       setLoading(false);
@@ -112,18 +112,6 @@ Acme Corporation`;
     setExtractedData(null);
     setProjectCreated(false);
     setProjectId(null);
-  };
-
-  const getConfidenceColor = (score) => {
-    if (score >= 0.8) return 'text-green-600 bg-green-100';
-    if (score >= 0.6) return 'text-yellow-600 bg-yellow-100';
-    return 'text-red-600 bg-red-100';
-  };
-
-  const getConfidenceText = (score) => {
-    if (score >= 0.8) return 'High';
-    if (score >= 0.6) return 'Medium';
-    return 'Low';
   };
 
   return (
@@ -421,19 +409,43 @@ Acme Corporation`;
                 {/* Confidence Scores */}
                 <div className="space-y-3 mb-6">
                   <h3 className="font-medium text-slate-900">AI Confidence Scores</h3>
-                  
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-slate-600">Budget</span>
-                      <Badge className={getConfidenceColor(extractedData.confidence.budget)}>
-                        {getConfidenceText(extractedData.confidence.budget)} ({Math.round(extractedData.confidence.budget * 100)}%)
-                      </Badge>
+
+                  <div className="space-y-3">
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-sm text-slate-600">Budget</span>
+                        <span className="text-sm font-medium text-slate-900">
+                          {Math.round(extractedData.confidence.budget * 100)}%
+                        </span>
+                      </div>
+                      <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                        <div
+                          className="h-full transition-all duration-300 rounded-full"
+                          style={{
+                            width: `${Math.round(extractedData.confidence.budget * 100)}%`,
+                            backgroundColor: extractedData.confidence.budget >= 0.8 ? '#10b981' :
+                                           extractedData.confidence.budget >= 0.6 ? '#f59e0b' : '#ef4444'
+                          }}
+                        />
+                      </div>
                     </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-slate-600">Timeline</span>
-                      <Badge className={getConfidenceColor(extractedData.confidence.timeline)}>
-                        {getConfidenceText(extractedData.confidence.timeline)} ({Math.round(extractedData.confidence.timeline * 100)}%)
-                      </Badge>
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-sm text-slate-600">Timeline</span>
+                        <span className="text-sm font-medium text-slate-900">
+                          {Math.round(extractedData.confidence.timeline * 100)}%
+                        </span>
+                      </div>
+                      <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                        <div
+                          className="h-full transition-all duration-300 rounded-full"
+                          style={{
+                            width: `${Math.round(extractedData.confidence.timeline * 100)}%`,
+                            backgroundColor: extractedData.confidence.timeline >= 0.8 ? '#10b981' :
+                                           extractedData.confidence.timeline >= 0.6 ? '#f59e0b' : '#ef4444'
+                          }}
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
