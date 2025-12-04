@@ -144,7 +144,7 @@ INSTRUCTIONS:
 Return the complete JSON structure with ALL required fields filled."""
             
             response = self.client.messages.create(
-                model="claude-3-5-sonnet-20241022",
+                model="claude-3-opus-20240229",
                 max_tokens=1000,
                 system=self.system_message,
                 messages=[{"role": "user", "content": prompt}]
