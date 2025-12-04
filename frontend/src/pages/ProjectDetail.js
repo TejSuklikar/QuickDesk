@@ -42,6 +42,7 @@ const ProjectDetail = ({ user }) => {
   const [invoiceEdits, setInvoiceEdits] = useState({});
   // Added for demo - Success modal state
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showInvoiceSuccessModal, setShowInvoiceSuccessModal] = useState(false);
 
   useEffect(() => {
     loadProjectData();
@@ -113,11 +114,15 @@ const ProjectDetail = ({ user }) => {
       });
       
       setInvoices([response.data]);
-      
+
       // Update project status
       setProject(prev => ({ ...prev, status: 'Billing' }));
-      
-      alert(`💰 Invoice Created!\n\nInvoice ID: ${response.data.id}\nAmount: $${response.data.amount}\nDue: ${new Date(response.data.due_date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}\n\n🎯 Invoice is ready to send to client!`);
+
+      // Show success modal
+      setShowInvoiceSuccessModal(true);
+      setTimeout(() => {
+        setShowInvoiceSuccessModal(false);
+      }, 2500);
       
     } catch (error) {
       console.error('Error creating invoice:', error);
@@ -330,7 +335,7 @@ ${user.email}`);
 
   return (
     <div className="space-y-6 fade-in">
-      {/* Added for demo - Success Modal */}
+      {/* Added for demo - Contract Success Modal */}
       {showSuccessModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 animate-fade-in">
           <Card className="p-8 max-w-md mx-4 text-center animate-scale-in">
@@ -341,6 +346,21 @@ ${user.email}`);
             </div>
             <h2 className="text-2xl font-bold text-slate-900 mb-2">Contract Generated!</h2>
             <p className="text-slate-600">Professional service agreement ready for review</p>
+          </Card>
+        </div>
+      )}
+
+      {/* Invoice Success Modal */}
+      {showInvoiceSuccessModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 animate-fade-in">
+          <Card className="p-8 max-w-md mx-4 text-center animate-scale-in">
+            <div className="flex justify-center mb-4">
+              <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center animate-bounce">
+                <Receipt className="w-10 h-10 text-purple-600" />
+              </div>
+            </div>
+            <h2 className="text-2xl font-bold text-slate-900 mb-2">Invoice Created!</h2>
+            <p className="text-slate-600">Professional invoice ready to send to client</p>
           </Card>
         </div>
       )}

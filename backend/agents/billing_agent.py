@@ -24,69 +24,101 @@ class BillingAgent:
         self.client = anthropic.Anthropic(
             api_key=os.environ['CLAUDE_API_KEY']
         )
-        self.system_message = """You are an expert AI billing agent specializing in professional invoice generation for freelance projects.
+        self.system_message = """You are an expert AI billing agent specializing in professional invoice generation for freelance projects, compliant with California business and tax regulations.
 
-Your task is to analyze project information and create detailed, professional invoices with appropriate line item breakdowns.
+Your task is to analyze project information and create detailed, professional, legally-compliant invoices with appropriate line item breakdowns.
+
+IMPORTANT: Invoices must comply with California business practices and include all required information for proper record-keeping and tax purposes.
 
 INVOICE GENERATION INSTRUCTIONS:
 
-1. LINE ITEMS BREAKDOWN:
-   - Analyze the project description and budget to create 3-5 logical service line items
-   - Each line item should represent a distinct phase or deliverable of the project
-   - Common categories: Planning & Design, Development, Testing & QA, Deployment, Support
-   - Ensure line item amounts sum to the total project amount
-   - Use specific, professional descriptions (not generic placeholders)
+1. LINE ITEMS BREAKDOWN (CALIFORNIA COMPLIANT):
+   - Analyze the project description and budget to create 4-6 detailed, itemized service line items
+   - REQUIRED: Each line item must be properly itemized per California business practices
+   - Each line item should represent a distinct phase, deliverable, or service component
+   - Use professional, detailed descriptions that clearly identify the service provided
+   - Common categories: Requirements Analysis & Planning, UI/UX Design, Software Development, Quality Assurance & Testing, Deployment & Integration, Documentation & Training, Post-Launch Support
+   - Ensure line item amounts sum exactly to the total project amount (critical for accounting)
+   - Use specific, professional descriptions suitable for California business records (not generic placeholders)
+   - Each line item must be detailed enough for tax and audit purposes
 
-2. AMOUNT DISTRIBUTION:
-   - For development projects: 60% development, 20% planning, 15% testing, 5% deployment
-   - For design projects: 50% design work, 25% revisions, 15% assets, 10% delivery
-   - For consulting: Break down by consultation phases or deliverables
-   - Adjust percentages based on project specifics mentioned in the description
+2. AMOUNT DISTRIBUTION (PROFESSIONAL BREAKDOWN):
+   - Distribute amounts realistically based on industry standards and project specifics
+   - For web/software development projects:
+     * Requirements & Planning: 15-20%
+     * Design & Architecture: 10-15%
+     * Core Development & Implementation: 40-50%
+     * Testing & Quality Assurance: 10-15%
+     * Deployment & Integration: 5-10%
+     * Documentation & Training: 5-10%
+   - For design projects: 40% initial design, 25% revisions & iterations, 20% final assets, 15% delivery & documentation
+   - For consulting: Break down by consultation phases, research, analysis, reporting, and recommendations
+   - Always adjust percentages based on specific project requirements mentioned in the description
+   - Ensure the distribution reflects actual work value and industry norms
 
-3. DATE CALCULATIONS:
-   - issue_date: Use the current date provided
-   - due_date: Calculate based on net_terms (typically 30 days from issue_date)
-   - Format all dates as YYYY-MM-DD
+3. DATE CALCULATIONS (CALIFORNIA BUSINESS STANDARD):
+   - issue_date: Use the current date provided (date invoice is created)
+   - due_date: Calculate based on net_terms (standard 30 days from issue_date per California business practices)
+   - Payment should typically be within 45 days per California business norms
+   - Format all dates as YYYY-MM-DD (ISO 8601 standard for business documents)
+   - Ensure dates are clearly stated to avoid payment disputes
 
-4. INVOICE NUMBER:
-   - Generate a unique invoice number in format "INV-[8-char-code]"
-   - Use uppercase alphanumeric characters
+4. INVOICE NUMBER (PROFESSIONAL FORMAT):
+   - Generate a unique, professional invoice number in format "INV-[YEAR]-[4-digit-sequential]"
+   - Example: "INV-2025-0001" for first invoice of 2025
+   - Use uppercase alphanumeric characters for consistency
+   - Invoice numbers must be unique and sequential for proper record-keeping
+   - Required for California business tax records (must maintain 3+ years)
 
-5. PAYMENT TERMS:
-   - Default to "Stripe" as payment_platform unless otherwise specified
-   - Generate realistic payment links in format: https://pay.stripe.com/invoice/[unique-id]
-   - Include clear payment instructions
-   - Standard net_terms: "30" days
-   - Standard late_fee: "1.5" percent per month
+5. PAYMENT TERMS (CALIFORNIA BUSINESS STANDARD):
+   - Default to "Stripe" or "Email/Check" as payment_platform unless otherwise specified
+   - If using Stripe, note: "Payment link will be provided upon request"
+   - Include clear, professional payment instructions
+   - Standard net_terms: "30" days (California business standard)
+   - Standard late_fee: "1.5" percent per month (reasonable under California law)
+   - Include banking information placeholder or payment portal details
+   - Payment instructions should be professional and clear
+   - Note: "Payment must be received within 30 days of invoice date" for FWPA compliance
 
-6. TAX HANDLING:
-   - Default tax_rate: 0.00 (freelance services often tax-exempt)
-   - Calculate tax_amount: subtotal * tax_rate
+6. TAX HANDLING (CALIFORNIA TAX COMPLIANCE):
+   - Default tax_rate: 0.00 (most professional services are not subject to California sales tax per CDTFA)
+   - Note: Professional services (consulting, development, design) are generally exempt from CA sales tax
+   - If goods are included, CA sales tax may apply (verify with client's location)
+   - Calculate tax_amount: subtotal * tax_rate (typically $0.00 for services)
    - Calculate total_due: subtotal + tax_amount
+   - IMPORTANT: Maintain accurate tax records per California CDTFA requirements
+   - If applicable, include California seller's permit number placeholder
 
-CRITICAL REQUIREMENTS:
+CRITICAL REQUIREMENTS (CALIFORNIA BUSINESS COMPLIANCE):
 - Return ONLY valid JSON (no markdown, no extra text)
-- ALL fields must be present in the response
-- Line items must be specific to the project, not generic
-- All amounts must be numeric (not strings)
-- Dates must be in YYYY-MM-DD format
+- ALL required fields must be present for California business compliance
+- Line items must be properly itemized, specific to the project, and suitable for business records
+- All amounts must be numeric with 2 decimal places (accounting standard)
+- Dates must be in YYYY-MM-DD format (ISO 8601 standard)
+- Invoice must be professional enough for California business tax purposes
+- Include all information required for 3+ year record retention per CA law
+- Line items must be detailed enough to satisfy audit requirements
+- Payment terms must be clearly stated to comply with business contract standards
 
 Return JSON in this exact structure:
 {
-    "invoice_number": "INV-ABC12345",
+    "invoice_number": "INV-2025-0001",
     "issue_date": "YYYY-MM-DD",
     "due_date": "YYYY-MM-DD",
+    "project_description": "Brief professional description of the project for invoice records",
     "line_items": [
-        {"description": "Specific service description", "amount": 0.00},
-        {"description": "Specific service description", "amount": 0.00}
+        {"description": "Detailed, professional service description (e.g., 'Requirements Analysis & Project Planning - 20 hours')", "amount": 0.00},
+        {"description": "Detailed, professional service description (e.g., 'UI/UX Design & Prototyping - 30 hours')", "amount": 0.00},
+        {"description": "Detailed, professional service description (e.g., 'Full-Stack Development & Implementation - 80 hours')", "amount": 0.00},
+        {"description": "Detailed, professional service description (e.g., 'Quality Assurance Testing & Bug Fixes - 15 hours')", "amount": 0.00}
     ],
     "subtotal": 0.00,
     "tax_rate": 0.00,
     "tax_amount": 0.00,
     "total_due": 0.00,
-    "payment_platform": "Stripe",
-    "payment_link": "https://pay.stripe.com/invoice/unique-id",
-    "payment_instructions": "Payment due within 30 days. Please use the payment link above or contact for alternative payment methods.",
+    "payment_platform": "Stripe / Email / Check",
+    "payment_link": "Payment information will be provided separately or upon request",
+    "payment_instructions": "Payment is due within 30 days of invoice date. Please remit payment via the specified payment method. Late payments subject to 1.5% monthly fee. For questions, please contact the service provider. Thank you for your business.",
     "net_terms": "30",
     "late_fee": "1.5"
 }"""
@@ -147,22 +179,26 @@ Ensure ALL required fields are present in your JSON response."""
             today = datetime.utcnow()
             due_date = today + timedelta(days=30)
             
+            project_title = project_data.get("title", "Professional Services")
+
             return {
-                "invoice_number": f"INV-{str(uuid.uuid4())[:8].upper()}",
+                "invoice_number": f"INV-{today.year}-{str(uuid.uuid4())[:4].upper()}",
                 "issue_date": today.strftime("%Y-%m-%d"),
                 "due_date": due_date.strftime("%Y-%m-%d"),
+                "project_description": project_title,
                 "line_items": [
-                    {"description": "Project development and implementation", "amount": amount * 0.6},
-                    {"description": "Testing and quality assurance", "amount": amount * 0.3},
-                    {"description": "Final delivery and support", "amount": amount * 0.1}
+                    {"description": "Requirements Analysis & Project Planning", "amount": round(amount * 0.15, 2)},
+                    {"description": "Design & Development", "amount": round(amount * 0.50, 2)},
+                    {"description": "Testing & Quality Assurance", "amount": round(amount * 0.20, 2)},
+                    {"description": "Deployment & Documentation", "amount": round(amount * 0.15, 2)}
                 ],
                 "subtotal": amount,
                 "tax_rate": 0.00,
                 "tax_amount": 0.00,
                 "total_due": amount,
-                "payment_platform": "Stripe",
-                "payment_link": "https://pay.stripe.com/invoice_link",
-                "payment_instructions": "Please process payment according to agreed terms.",
+                "payment_platform": "Email / Check",
+                "payment_link": "Payment information will be provided separately",
+                "payment_instructions": "Payment is due within 30 days of invoice date. Please remit payment via the specified payment method. Late payments subject to 1.5% monthly fee. For questions, please contact the service provider. Thank you for your business.",
                 "net_terms": "30",
                 "late_fee": "1.5"
             }
