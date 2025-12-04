@@ -70,9 +70,9 @@ const Dashboard = () => {
   };
 
   const StatusTile = ({ title, count, progress, color, icon: Icon, description }) => {
-    // Calculate accurate progress based on project count
-    const actualProgress = count === 0 ? 0 : Math.min(100, (count / Math.max(count, 1)) * 100);
-    
+    // Use provided progress value, default to percentage based on count
+    const displayProgress = progress !== undefined ? progress : (count > 0 ? 100 : 0);
+
     return (
       <Card className="p-6 hover-lift transition-all duration-200 group">
         <div className="flex items-center justify-between mb-4">
@@ -84,16 +84,16 @@ const Dashboard = () => {
             <div className="text-sm text-slate-500">{title}</div>
           </div>
         </div>
-        
+
         <div className="mb-3">
           <div className="flex justify-between text-xs mb-1">
             <span className="text-slate-600">{description}</span>
             <span className="text-slate-500">{count > 0 ? `${count} active` : 'No activity'}</span>
           </div>
           <div className="progress-bar">
-            <div 
+            <div
               className={`progress-fill ${title.toLowerCase()}`}
-              style={{ width: count > 0 ? '100%' : '0%' }}
+              style={{ width: `${displayProgress}%` }}
             />
           </div>
         </div>

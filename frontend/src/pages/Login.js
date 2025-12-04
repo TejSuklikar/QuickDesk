@@ -44,7 +44,7 @@ const Login = ({ onLogin }) => {
         });
       }
     } catch (err) {
-      setError(err.response?.data?.detail || 'Authentication failed');
+      setError('Authentication failed. Please check your credentials and try again.');
     } finally {
       setLoading(false);
     }
@@ -73,7 +73,7 @@ const Login = ({ onLogin }) => {
         });
       }
     } catch (err) {
-      setError(err.response?.data?.detail || 'Demo login failed');
+      setError('Demo login failed. Please try again.');
     } finally {
       setDemoLoading(false);
     }

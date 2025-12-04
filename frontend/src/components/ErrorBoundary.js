@@ -41,14 +41,6 @@ class ErrorBoundary extends React.Component {
               We encountered an unexpected error. Please try refreshing the page.
             </p>
 
-            {process.env.NODE_ENV === 'development' && this.state.error && (
-              <div className="mb-6 p-4 bg-slate-100 rounded-lg text-left">
-                <p className="text-sm text-slate-700 font-mono break-all">
-                  {this.state.error.toString()}
-                </p>
-              </div>
-            )}
-
             <Button
               onClick={this.handleRefresh}
               className="bg-gradient-to-r from-blue-500 to-purple-600"
